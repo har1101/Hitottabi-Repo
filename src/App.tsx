@@ -4,6 +4,12 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import { Header, ChatArea, InputArea } from './components';
 import { v4 as uuidv4 } from 'uuid';
+import { Amplify } from 'aws-amplify';
+import { Authenticator } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+import outputs from '../amplify_outputs.json';
+
+Amplify.configure(outputs);
 
 const theme = createTheme({
   palette: {
@@ -57,24 +63,30 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box sx={{ 
-        height: '100vh', 
-        display: 'flex', 
-        flexDirection: 'column',
-      }}>
-        <Header />
+    <Authenticator>
+      {({ signOut, user }) => (
+    <>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
         <Box sx={{ 
-          flex: 1,
-          display: 'flex',
+          height: '100vh', 
+          display: 'flex', 
           flexDirection: 'column',
-          overflow: 'hidden',
         }}>
-          <ChatArea messages={messages} />
-          <InputArea input={input} setInput={setInput} sendMessage={sendMessage} />
+          <Header signOut={signOut} />
+          <Box sx={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}>
+            <ChatArea messages={messages} />
+            <InputArea input={input} setInput={setInput} sendMessage={sendMessage} />
+          </Box>
         </Box>
-      </Box>
-    </ThemeProvider>
+      </ThemeProvider>
+    </>
+      )}
+    </Authenticator>
   );
 }
