@@ -3,6 +3,10 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
+import type { Schema } from '../../amplify/data/resource'
+import { generateClient } from 'aws-amplify/data'
+
+const client = generateClient<Schema>()
 
 interface InputAreaProps {
   input: string;
@@ -19,7 +23,29 @@ export function InputArea({ input, setInput, sendMessage }: InputAreaProps) {
     }
   }
 
+  const inputDynamoDB = async () => {
+    await client.models.User.create({
+      PK: 'User#10001',
+      SK: 'Metadata',
+      UserFirstName: '田中',
+      UserLastName: '太郎',
+      UserEmail: 'taro@example.com',
+      UserPhone: 1234567890,
+      UserAddress: '東京都新宿区新宿1-1-1',
+      UserBirthday: '1990-01-01',
+      UserAge: 30,
+      UserGender: '男性',
+      StartDate: '2024-10-01',
+      EndDate: '2024-10-03',
+      TotalSum: 60000,
+      NumberOfPeople: 2,
+      AirplaneId: "Airplane#10001",
+    })
+  }
+
   return (
+    <div>
+      <button onClick={inputDynamoDB}>Add new Data2</button>
     <Box 
       sx={{
         position: 'sticky',
@@ -65,5 +91,6 @@ export function InputArea({ input, setInput, sendMessage }: InputAreaProps) {
         </IconButton>
       </Box>
     </Box>
+    </div>
   );
 }
