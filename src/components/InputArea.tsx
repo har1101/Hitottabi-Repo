@@ -13,7 +13,7 @@ interface InputAreaProps {
 export function InputArea({ input, setInput, sendMessage }: InputAreaProps) {
   // Enterキーが押されたときにメッセージを送信する
   function handleKeyPress(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
