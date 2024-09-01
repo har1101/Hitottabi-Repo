@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
+import { Box } from '@mui/material';
 
 
 import { ChatViewArea } from "../ChatViewArea.tsx";
 import { ChatInputArea } from "../ChatInputArea.tsx";
+import { HotelElement } from "../element/HotelElement.tsx";
 
 import { convertNonNullableValue, isJsonParsable, Nullable } from "../../common.ts";
 import { v4 as uuid } from "uuid";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
+
 
 const client = generateClient<Schema>();
 
@@ -22,7 +24,7 @@ export interface Message {
     element: React.JSX.Element;
 }
 
-interface Hotel {
+export interface Hotel {
     name: string,
     description: string
 }
@@ -96,46 +98,6 @@ export function MainContent(): React.JSX.Element {
             setMessages((prev) => [...prev, aiMessage]);
         }
 
-        const hotelsElement = (hotels: Hotel[]) => {
-
-            const changeSelectedHotel = (event: React.ChangeEvent<HTMLInputElement>) => {
-                const selected = hotels.find(hotel => hotel.name === event.target.value) || null;
-                setSelectedHotel(selected);
-            }
-
-            return (
-                <FormControl component="fieldset">
-                    <FormLabel id="radio-group-hotels">Select a Hotel</FormLabel>
-                    <RadioGroup
-                        aria-labelledby="radio-group-hotels"
-                        name="hotels"
-                        onChange={changeSelectedHotel}
-                    >
-                        {hotels.map((hotel) => (
-                            <FormControlLabel
-                                key={hotel.name}
-                                value={hotel.name}
-                                control={<Radio />}
-                                label={
-                                    <Box mt={2}>
-                                        <Box>{hotel.name}</Box>
-                                        <Box>{hotel.description}</Box>
-                                    </Box>
-                                }
-                            />
-                        ))}
-                    </RadioGroup>
-                    {selectedHotel && (
-                        <Box mt={2}>
-                            <h3>Selected Hotel:</h3>
-                            <Box>{selectedHotel.name}</Box>
-                            <Box>{selectedHotel.description}</Box>
-                        </Box>
-                    )}
-                </FormControl>
-            )
-        };
-
         const convertedResponse: string = convertNonNullableValue(response)
 
         let element: React.JSX.Element = <></>;
@@ -144,7 +106,16 @@ export function MainContent(): React.JSX.Element {
             const parsedResponse: AgentResponse = JSON.parse(convertedResponse)
 
             if ('hotels' in parsedResponse) {
-                element = hotelsElement(parsedResponse.hotels)
+                const changeSelectedHotel = (value: string) => {
+                    const selected = parsedResponse.hotels.find(hotel => hotel.name === value) || null;
+                    setSelectedHotel(selected);
+                }
+
+                element = <HotelElement
+                    hotels={parsedResponse.hotels}
+                    changeSelectedHotel={changeSelectedHotel}
+                >
+                </HotelElement>
             }
         } else {
             element = <>{convertedResponse}</>
@@ -163,8 +134,6 @@ export function MainContent(): React.JSX.Element {
      */
     const sendMessage = async () => {
         if (!input.trim()) return;
-
-        console.log(selectedHotel);
 
         renderUserMessage(input);
 
