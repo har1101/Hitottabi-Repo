@@ -1,14 +1,14 @@
 import { defineBackend } from '@aws-amplify/backend';
 import * as iam from "aws-cdk-lib/aws-iam"
-import { sayHello } from "./functions/say-hello/resource";
+import { recommendationsHotels } from "./functions/recommendation-hotels/resource";
 import { data } from "./data/resource"
 
 const backend = defineBackend({
     data,
-    sayHello
+    recommendationsHotels: recommendationsHotels
 });
 
-const sayHelloLambda = backend.sayHello.resources.lambda
+const recommendationsHotelsLambda = backend.recommendationsHotels.resources.lambda
 
 const statement = new iam.PolicyStatement({
     sid: "AllowAgentForBedrockInvoke",
@@ -18,6 +18,14 @@ const statement = new iam.PolicyStatement({
     resources: ["arn:aws:bedrock:ap-northeast-1:026090531931:agent-alias/*/*"], // 必要に応じて特定のモデルに制限可能
 });
 
-sayHelloLambda.addToRolePolicy(statement)
+recommendationsHotelsLambda.addToRolePolicy(statement)
+
+backend.addOutput({
+    custom: {
+        recommendationsHotels: {
+            functionName: recommendationsHotelsLambda.functionName,
+        }
+    }
+})
 
 export default backend

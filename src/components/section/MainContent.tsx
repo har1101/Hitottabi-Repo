@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 
 import { ChatViewArea } from "../ChatViewArea.tsx";
@@ -29,6 +29,10 @@ const boxStyle = {
 }
 
 export function MainContent(): React.JSX.Element {
+    useEffect(() => {
+        sessionStorage.setItem('sessionId', uuid())
+    }, [])
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
 
@@ -42,7 +46,7 @@ export function MainContent(): React.JSX.Element {
             sender: 'user',
             text: <>{text}</>,
         };
-        setInput(''); // 入力欄をクリア
+        setInput('');
         setMessages((prev) => [...prev, userMessage]);
     }
 
@@ -52,12 +56,18 @@ export function MainContent(): React.JSX.Element {
      */
     const executeAgent = async (text: string) => {
         try {
-            const response = await client.queries.sayHello({
-                inputText: text
-            });
+            const sessionId = sessionStorage.getItem('sessionId')
+            if (!sessionId) {
+                console.log('The session ID is invalid.')
+                return;
+            } else {
+                const response = await client.queries.recommendationsHotels({
+                    sessionId: sessionId,
+                    inputText: text
+                });
 
-            return response.data
-
+                return response.data
+            }
         } catch (error) {
             console.error('Failed to fetch text:', error);
         }
