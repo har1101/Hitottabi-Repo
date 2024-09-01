@@ -11,7 +11,7 @@ export const handler: Schema["recommendationsHotels"]["functionHandler"] = async
 
     const params : InvokeAgentCommandInput = {
         agentId: "SRNGBSVDR3", // 使用するエージェントのIDを指定
-        agentAliasId: "YFSIRT3IX8",
+        agentAliasId: "PDVOTJEIKF",
         sessionId: sessionId,
         inputText: inputText, // 入力テキストを設定
     };

@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import PersonIcon from '@mui/icons-material/Person';
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import { Message } from "./section/MainContent.tsx";
@@ -34,9 +33,9 @@ export function ChatMessage(message: Message): React.JSX.Element {
             <Paper elevation={2} sx={getPaperStyles(isUser)}>
                 <Box sx={boxStyles}>
                     {isUser ? <PersonIcon sx={{mr: 1}}/> : <AirplanemodeActiveIcon sx={{mr: 1}}/>}
-                    <Typography variant="body1">
-                        {message.text}
-                    </Typography>
+                    <Box sx={{ fontSize: '16px', lineHeight: '1.5' }}>
+                        {message.element}
+                    </Box>
                 </Box>
             </Paper>
         </Box>

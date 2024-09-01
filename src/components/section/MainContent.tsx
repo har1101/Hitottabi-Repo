@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
+
 
 import { ChatViewArea } from "../ChatViewArea.tsx";
 import { ChatInputArea } from "../ChatInputArea.tsx";
@@ -18,8 +19,18 @@ export interface Messages {
 export interface Message {
     id: string;
     sender: 'user' | 'ai';
-    text: React.JSX.Element;
+    element: React.JSX.Element;
 }
+
+interface Hotel {
+    name: string,
+    description: string
+}
+
+interface AgentResponse {
+    hotels: Hotel[]
+}
+
 
 const boxStyle = {
     flex: 1,
@@ -35,6 +46,7 @@ export function MainContent(): React.JSX.Element {
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
+    const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
 
     /**
      * ユーザーの入力値を画面に反映
@@ -44,7 +56,7 @@ export function MainContent(): React.JSX.Element {
         const userMessage: Message = {
             id: uuid(),
             sender: 'user',
-            text: <>{text}</>,
+            element: <>{text}</>,
         };
         setInput('');
         setMessages((prev) => [...prev, userMessage]);
@@ -78,30 +90,72 @@ export function MainContent(): React.JSX.Element {
      * @param response
      */
     const renderAIMessage = (response: Nullable<string> | undefined) => {
-        const render = (text: string) => {
-            const botMessage: Message = {
-                id: uuid(),
-                sender: 'ai',
-                text: <>{text}</>,
-            };
-            setMessages((prev) => [...prev, botMessage]);
+
+
+        const render = (aiMessage: Message) => {
+            setMessages((prev) => [...prev, aiMessage]);
         }
 
-        try {
-            const convertedResponse: string = convertNonNullableValue(response)
-            if (isJsonParsable(convertedResponse)) {
-                const parsedResponse = JSON.parse(convertedResponse)
-                if ('hotels' in parsedResponse) {
-                    render(convertedResponse)
-                }
-            } else {
-                render(convertedResponse)
+        const hotelsElement = (hotels: Hotel[]) => {
+
+            const changeSelectedHotel = (event: React.ChangeEvent<HTMLInputElement>) => {
+                const selected = hotels.find(hotel => hotel.name === event.target.value) || null;
+                setSelectedHotel(selected);
             }
-        } catch (error) {
-            if (error instanceof TypeError) {
-                render('AIからの回答が異常な値を検出しました。しばらく待ってから再度お試しください。')
+
+            return (
+                <FormControl component="fieldset">
+                    <FormLabel id="radio-group-hotels">Select a Hotel</FormLabel>
+                    <RadioGroup
+                        aria-labelledby="radio-group-hotels"
+                        name="hotels"
+                        onChange={changeSelectedHotel}
+                    >
+                        {hotels.map((hotel) => (
+                            <FormControlLabel
+                                key={hotel.name}
+                                value={hotel.name}
+                                control={<Radio />}
+                                label={
+                                    <Box mt={2}>
+                                        <Box>{hotel.name}</Box>
+                                        <Box>{hotel.description}</Box>
+                                    </Box>
+                                }
+                            />
+                        ))}
+                    </RadioGroup>
+                    {selectedHotel && (
+                        <Box mt={2}>
+                            <h3>Selected Hotel:</h3>
+                            <Box>{selectedHotel.name}</Box>
+                            <Box>{selectedHotel.description}</Box>
+                        </Box>
+                    )}
+                </FormControl>
+            )
+        };
+
+        const convertedResponse: string = convertNonNullableValue(response)
+
+        let element: React.JSX.Element = <></>;
+
+        if (isJsonParsable(convertedResponse)) {
+            const parsedResponse: AgentResponse = JSON.parse(convertedResponse)
+
+            if ('hotels' in parsedResponse) {
+                element = hotelsElement(parsedResponse.hotels)
             }
+        } else {
+            element = <>{convertedResponse}</>
         }
+
+        const aiMessage: Message = {
+            id: uuid(),
+            sender: 'ai',
+            element: element,
+        };
+        render(aiMessage)
     }
 
     /**
@@ -109,6 +163,8 @@ export function MainContent(): React.JSX.Element {
      */
     const sendMessage = async () => {
         if (!input.trim()) return;
+
+        console.log(selectedHotel);
 
         renderUserMessage(input);
 
