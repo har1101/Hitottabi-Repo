@@ -5,18 +5,15 @@ import {
     InvokeAgentCommand, InvokeAgentCommandInput,
     InvokeAgentCommandOutput, ResponseStream
 } from "@aws-sdk/client-bedrock-agent-runtime";
-import { convertNonNullableValue } from "../../../src/common";
 
-export const handler: Schema["sayHello"]["functionHandler"] = async (event) => {
-    const {inputText} = event.arguments
-
-    const noNullableInputText = convertNonNullableValue(inputText)
+export const handler: Schema["recommendationsHotels"]["functionHandler"] = async (event) => {
+    const {sessionId, inputText} = event.arguments
 
     const params : InvokeAgentCommandInput = {
         agentId: "SRNGBSVDR3", // 使用するエージェントのIDを指定
-        agentAliasId: "YFSIRT3IX8",
-        sessionId: "ccc",
-        inputText: noNullableInputText, // 入力テキストを設定
+        agentAliasId: "PDVOTJEIKF",
+        sessionId: sessionId,
+        inputText: inputText, // 入力テキストを設定
     };
 
     const client = new BedrockAgentRuntimeClient({region: "ap-northeast-1"});
