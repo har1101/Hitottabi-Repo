@@ -4,29 +4,21 @@ import { Box } from '@mui/material';
 
 import { ChatViewArea } from "../ChatViewArea.tsx";
 import { ChatInputArea } from "../ChatInputArea.tsx";
-import { HotelElement } from "../element/HotelElement.tsx";
+import { Hotel, HotelElement } from "../element/HotelElement.tsx";
 
 import { convertNonNullableValue, isJsonParsable, Nullable } from "../../common.ts";
 import { v4 as uuid } from "uuid";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
+import { Message } from "../ChatMessage.tsx";
 
 
 const client = generateClient<Schema>();
 
-export interface Messages {
-    messages: Message[]
-}
-
-export interface Message {
-    id: string;
-    sender: 'user' | 'ai';
-    element: React.JSX.Element;
-}
-
-export interface Hotel {
-    name: string,
-    description: string
+interface AgentRequest {
+    sessionId: string,
+    inputText: string,
+    // selectedHotel: SelectedHotel | null
 }
 
 interface AgentResponse {
@@ -48,7 +40,7 @@ export function MainContent(): React.JSX.Element {
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
-    const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+    const [isSending, setIsSending] = useState(false);
 
     /**
      * ユーザーの入力値を画面に反映
@@ -75,10 +67,11 @@ export function MainContent(): React.JSX.Element {
                 console.log('The session ID is invalid.')
                 return;
             } else {
-                const response = await client.queries.recommendationsHotels({
+                const request: AgentRequest = {
                     sessionId: sessionId,
-                    inputText: text
-                });
+                    inputText: text,
+                }
+                const response = await client.queries.recommendationsHotels(request);
 
                 return response.data
             }
@@ -93,7 +86,6 @@ export function MainContent(): React.JSX.Element {
      */
     const renderAIMessage = (response: Nullable<string> | undefined) => {
 
-
         const render = (aiMessage: Message) => {
             setMessages((prev) => [...prev, aiMessage]);
         }
@@ -106,14 +98,42 @@ export function MainContent(): React.JSX.Element {
             const parsedResponse: AgentResponse = JSON.parse(convertedResponse)
 
             if ('hotels' in parsedResponse) {
-                const changeSelectedHotel = (value: string) => {
-                    const selected = parsedResponse.hotels.find(hotel => hotel.name === value) || null;
-                    setSelectedHotel(selected);
+                const changeSelectedHotel = (selectedHotel: Hotel) => {
+                    console.log(selectedHotel)
+                }
+
+                const registerHotel = async (selectedHotel: Hotel) => {
+                    const sessionId = sessionStorage.getItem('sessionId')
+                    if (!sessionId) {
+                        console.log('The session ID is invalid.')
+                        return;
+                    }
+
+                    await client.models.Plan.create({
+                        PK: sessionId,
+                        SK: 'Metadata',
+                        Hotel: {
+                            name: selectedHotel.name,
+                            description: selectedHotel.description
+                        },
+                    })
+
+                    // 次のエージェントをよぶ
+
+
+                    const aiMessage: Message = {
+                        id: uuid(),
+                        sender: 'ai',
+                        element: <>{selectedHotel.name}が選ばれました。</>,
+                    };
+                    render(aiMessage)
                 }
 
                 element = <HotelElement
                     hotels={parsedResponse.hotels}
                     changeSelectedHotel={changeSelectedHotel}
+                    registerHotel={registerHotel}
+
                 >
                 </HotelElement>
             }
@@ -133,19 +153,22 @@ export function MainContent(): React.JSX.Element {
      * ユーザーの入力をエージェントに送信する
      */
     const sendMessage = async () => {
-        if (!input.trim()) return;
-
+        if (!input.trim() || isSending) return;
+        setIsSending(true);
         renderUserMessage(input);
 
-        const response: Nullable<string> | undefined = await executeAgent(input)
-
-        renderAIMessage(response)
+        try {
+            const response: Nullable<string> | undefined = await executeAgent(input)
+            renderAIMessage(response)
+        } finally {
+            setIsSending(false);
+        }
     }
 
     return (
         <Box component="main" sx={boxStyle}>
             <ChatViewArea messages={messages}/>
-            <ChatInputArea input={input} setInput={setInput} sendMessage={sendMessage}/>
+            <ChatInputArea input={input} setInput={setInput} sendMessage={sendMessage} isDisabled={false}/>
         </Box>
     );
 }

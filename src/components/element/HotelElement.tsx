@@ -1,20 +1,33 @@
 import React, { useState } from "react";
-import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
-import { Hotel } from "../section/MainContent.tsx";
+import { Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
 
-interface Props {
-    hotels: Hotel[]
-    changeSelectedHotel: (value: string) => void;
+export interface Hotel {
+    name: string,
+    description: string
 }
 
-export function HotelElement({hotels, changeSelectedHotel}: Props): React.JSX.Element {
-    const [selected, setSelected] = useState<Hotel | null>(null);
+interface Props {
+    hotels: Hotel[];
+    changeSelectedHotel: (hotel: Hotel) => void;
+    registerHotel: (hotel: Hotel) => void;
+
+}
+
+export function HotelElement({hotels, changeSelectedHotel, registerHotel}: Props): React.JSX.Element {
+    const [selected, setSelected] =
+        useState<Hotel>(hotels[0]);
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const hotel = hotels.find(hotel => hotel.name === event.target.value) || null;
-        changeSelectedHotel(event.target.value)
-        setSelected(hotel)
+
+        if (hotel) {
+            changeSelectedHotel(hotel)
+            setSelected(hotel)
+        }
     }
+
+    const onClick = () => registerHotel(selected)
+
 
     return (
         <FormControl component="fieldset">
@@ -24,6 +37,7 @@ export function HotelElement({hotels, changeSelectedHotel}: Props): React.JSX.El
             <RadioGroup
                 aria-labelledby="radio-group-hotels"
                 name="hotels"
+                // defaultValue={selected?.name || ""}
                 onChange={onChange}
             >
                 {hotels.map((hotel) => (
@@ -40,15 +54,14 @@ export function HotelElement({hotels, changeSelectedHotel}: Props): React.JSX.El
                     />
                 ))}
             </RadioGroup>
-            {selected && (
-                <Box mt={2}>
-                    <FormLabel id="radio-group-selected-hotels">
-                        あなたが選んだホテル
-                    </FormLabel>
-                    <Box mt={2}>{selected.name}</Box>
-                    <Box>{selected.description}</Box>
-                </Box>
-            )}
+            <Box mt={2}>
+                <Button variant="contained" color="primary" sx={{ mx: 1 }} onClick={onClick}>
+                    OK
+                </Button>
+                <Button variant="contained" color="secondary" sx={{ mx: 1 }}>
+                    価格を下げたい
+                </Button>
+            </Box>
         </FormControl>
     )
 }

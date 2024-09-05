@@ -2,8 +2,17 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import PersonIcon from '@mui/icons-material/Person';
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
-import { Message } from "./section/MainContent.tsx";
 import React from "react";
+
+export interface Messages {
+    messages: Message[]
+}
+
+export interface Message {
+    id: string;
+    sender: 'user' | 'ai';
+    element: React.JSX.Element;
+}
 
 const getPaperStyles = (isUser: boolean) => ({
     p: 2,

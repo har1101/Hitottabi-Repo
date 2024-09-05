@@ -11,7 +11,18 @@ const schema = a.schema({
         .returns(a.string())
         // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(recommendationsHotels))
-        .authorization(allow => [allow.publicApiKey()])
+        .authorization(allow => [allow.publicApiKey()]),
+    Plan: a.model({
+        PK: a.id().required(),
+        SK: a.string().required(),
+        Hotel: a.customType({
+            name: a.string().required(),
+            description: a.string().required()
+        })
+    })
+        .identifier(['PK', 'SK'])
+        .authorization(allow => [allow.publicApiKey()]),
+
 });
 
 // Used for code completion / highlighting when making requests from frontend

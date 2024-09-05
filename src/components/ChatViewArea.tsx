@@ -1,7 +1,10 @@
 import { useRef, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import { Messages } from './section/MainContent.tsx';
-import { ChatMessage } from "./ChatMessage";
+import { ChatMessage, Message } from "./ChatMessage";
+
+export interface Messages {
+    messages: Message[]
+}
 
 const useWindowWidth = () => {
     const [width, setWidth] = useState(window.innerWidth);

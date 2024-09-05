@@ -3,9 +3,11 @@ import * as iam from "aws-cdk-lib/aws-iam"
 import { recommendationsHotels } from "./functions/recommendation-hotels/resource";
 import { data } from "./data/resource"
 
+
 const backend = defineBackend({
     data,
-    recommendationsHotels: recommendationsHotels
+    // auth,
+    recommendationsHotels: recommendationsHotels,
 });
 
 const recommendationsHotelsLambda = backend.recommendationsHotels.resources.lambda
