@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -8,7 +7,8 @@ interface Props {
     input: string;
     setInput: (input: string) => void;
     sendMessage: () => void;
-    isDisabled: boolean
+    inputAreaStyle: object
+    isInputAreaDisabled: boolean
 }
 
 const outerBoxStyles = {
@@ -31,26 +31,7 @@ const innerBoxStyles = {
     padding: 2
 };
 
-const textFieldStyles = {
-    '& .MuiOutlinedInput-root': {
-        borderRadius: '20px',
-        '&.Mui-focused fieldset': {
-            borderColor: 'primary.main',
-        },
-    },
-};
-
-// const textFieldStylesDisabled = {
-//     '& .MuiOutlinedInput-root': {
-//         backgroundColor: '#f0f0f0',
-//         borderRadius: '20px',
-//         '&.Mui-focused fieldset': {
-//             borderColor: 'primary.main',
-//         },
-//     },
-// };
-
-export function ChatInputArea({input, setInput, sendMessage, isDisabled}: Props) {
+export function ChatInputArea({input, setInput, sendMessage, inputAreaStyle, isInputAreaDisabled}: Props) {
 
     /**
      * Shift + Enterキーを押下した時にメッセージが送信される
@@ -75,8 +56,8 @@ export function ChatInputArea({input, setInput, sendMessage, isDisabled}: Props)
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    sx={textFieldStyles}
-                    disabled={false}
+                    sx={inputAreaStyle}
+                    disabled={isInputAreaDisabled}
                 />
                 <IconButton color="primary" onClick={sendMessage} sx={{ml: 1}}>
                     <SendIcon/>
