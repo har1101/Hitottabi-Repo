@@ -154,7 +154,7 @@ export function MainContent(): React.JSX.Element {
 
                 if (planCreationStatus.inProgressAgent == Agent.HOTEL) {
                     planCreationStatus.hotel = AgentStatus.IN_PROGRESS
-                    const response = await client.queries.recommendationsHotels(request);
+                    const response = await client.queries.recommendationHotels(request);
                     return response.data
                 } else if (planCreationStatus.inProgressAgent == Agent.ACTIVITY) {
                     console.log('activity')

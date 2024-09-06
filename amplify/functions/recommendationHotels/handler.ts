@@ -2,11 +2,14 @@ import type { Schema } from "../../data/resource"
 
 import {
     BedrockAgentRuntimeClient,
-    InvokeAgentCommand, InvokeAgentCommandInput,
-    InvokeAgentCommandOutput, ResponseStream
+    InvokeAgentCommand,
+    InvokeAgentCommandInput,
+    InvokeAgentCommandOutput,
+    ResponseStream
 } from "@aws-sdk/client-bedrock-agent-runtime";
 
-export const handler: Schema["recommendationsHotels"]["functionHandler"] = async (event) => {
+
+export const handler: Schema["recommendationHotels"]["functionHandler"] = async (event) => {
     const {sessionId, inputText} = event.arguments
 
     const params : InvokeAgentCommandInput = {
@@ -20,18 +23,20 @@ export const handler: Schema["recommendationsHotels"]["functionHandler"] = async
     const command = new InvokeAgentCommand(params);
     const response: InvokeAgentCommandOutput = await client.send(command);
 
-    const completion: AsyncIterable<ResponseStream> = response.completion
+    if (!response.completion) {
+        console.error("No completion stream found in the response");
+        return null; // completionが存在しない場合はnullを返す
+    }
 
+    const completion: AsyncIterable<ResponseStream> = response.completion;
     const actualStream = completion.options.messageStream;
-
-    console.log("actualStream: " + actualStream)
+    let finalResponse: string | null = null; // 最終的なレスポンスを格納
 
     for await (const value of actualStream) {
         const jsonString = new TextDecoder().decode(value.body);
         const base64encoded = JSON.parse(jsonString).bytes;
-        const decodedString = Buffer.from(base64encoded, 'base64').toString();
-        console.log(decodedString)
-
-        return decodedString;
+        finalResponse = Buffer.from(base64encoded, 'base64').toString();
     }
+
+    return finalResponse;
 }
