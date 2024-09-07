@@ -1,10 +1,11 @@
+import React from "react";
+
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import FlightIcon from '@mui/icons-material/Flight';
 
-export function Header(): JSX.Element {
-  // return以下の内容が画面に表示される
+export function Header(): React.JSX.Element {
   return (
     <AppBar 
       position="sticky"
@@ -19,4 +20,4 @@ export function Header(): JSX.Element {
         </Toolbar>
     </AppBar>
   );
-};
+}

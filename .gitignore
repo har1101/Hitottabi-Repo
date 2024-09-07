@@ -25,3 +25,5 @@ dist-ssr
 
 # package-lock.json
 package-lock.json
+amplify_outputs.json
+.amplify/*

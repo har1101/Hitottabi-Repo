@@ -1,3 +1,334 @@
 {
+  "data": {
+    "url": "https://ube5nupqzbe5zgoxnwrbni5nka.appsync-api.ap-northeast-1.amazonaws.com/graphql",
+    "aws_region": "ap-northeast-1",
+    "api_key": "da2-qgz6r3tlxjhejoalxyeuabu7di",
+    "default_authorization_type": "API_KEY",
+    "authorization_types": [
+      "AWS_IAM"
+    ],
+    "model_introspection": {
+      "version": 1,
+      "models": {
+        "Plan": {
+          "name": "Plan",
+          "fields": {
+            "PK": {
+              "name": "PK",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "SK": {
+              "name": "SK",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "Hotel": {
+              "name": "Hotel",
+              "isArray": false,
+              "type": {
+                "nonModel": "PlanHotel"
+              },
+              "isRequired": false,
+              "attributes": []
+            },
+            "Flight": {
+              "name": "Flight",
+              "isArray": false,
+              "type": {
+                "nonModel": "PlanFlight"
+              },
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "Plans",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "fields": [
+                  "PK",
+                  "SK"
+                ]
+              }
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "public",
+                    "provider": "apiKey",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": true,
+            "primaryKeyFieldName": "PK",
+            "sortKeyFieldNames": [
+              "SK"
+            ]
+          }
+        }
+      },
+      "enums": {},
+      "nonModels": {
+        "PlanHotel": {
+          "name": "PlanHotel",
+          "fields": {
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "description": {
+              "name": "description",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            }
+          }
+        },
+        "PlanFlight": {
+          "name": "PlanFlight",
+          "fields": {
+            "departure": {
+              "name": "departure",
+              "isArray": false,
+              "type": {
+                "nonModel": "PlanFlightDeparture"
+              },
+              "isRequired": false,
+              "attributes": []
+            },
+            "return": {
+              "name": "return",
+              "isArray": false,
+              "type": {
+                "nonModel": "PlanFlightReturn"
+              },
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        },
+        "PlanFlightDeparture": {
+          "name": "PlanFlightDeparture",
+          "fields": {
+            "flight_number": {
+              "name": "flight_number",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "departure_airport": {
+              "name": "departure_airport",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "departure_time": {
+              "name": "departure_time",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "arrival_time": {
+              "name": "arrival_time",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "price": {
+              "name": "price",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "seats": {
+              "name": "seats",
+              "isArray": true,
+              "type": "String",
+              "isRequired": false,
+              "attributes": [],
+              "isArrayNullable": false
+            }
+          }
+        },
+        "PlanFlightReturn": {
+          "name": "PlanFlightReturn",
+          "fields": {
+            "flight_number": {
+              "name": "flight_number",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "departure_airport": {
+              "name": "departure_airport",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "departure_time": {
+              "name": "departure_time",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "arrival_time": {
+              "name": "arrival_time",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "price": {
+              "name": "price",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "seats": {
+              "name": "seats",
+              "isArray": true,
+              "type": "String",
+              "isRequired": false,
+              "attributes": [],
+              "isArrayNullable": false
+            }
+          }
+        }
+      },
+      "queries": {
+        "recommendationActivities": {
+          "name": "recommendationActivities",
+          "isArray": false,
+          "type": "String",
+          "isRequired": false,
+          "arguments": {
+            "sessionId": {
+              "name": "sessionId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            },
+            "inputText": {
+              "name": "inputText",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            }
+          }
+        },
+        "recommendationHotels": {
+          "name": "recommendationHotels",
+          "isArray": false,
+          "type": "String",
+          "isRequired": false,
+          "arguments": {
+            "sessionId": {
+              "name": "sessionId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            },
+            "inputText": {
+              "name": "inputText",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            }
+          }
+        },
+        "recommendationsFlight": {
+          "name": "recommendationsFlight",
+          "isArray": false,
+          "type": "String",
+          "isRequired": false,
+          "arguments": {
+            "sessionId": {
+              "name": "sessionId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            },
+            "inputText": {
+              "name": "inputText",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            }
+          }
+        },
+        "confirmUserInfo": {
+          "name": "confirmUserInfo",
+          "isArray": false,
+          "type": "String",
+          "isRequired": false,
+          "arguments": {
+            "sessionId": {
+              "name": "sessionId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            },
+            "inputText": {
+              "name": "inputText",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            }
+          }
+        }
+      }
+    }
+  },
   "version": "1"
 }
