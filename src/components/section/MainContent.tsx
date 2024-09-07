@@ -19,8 +19,41 @@ interface AgentRequest {
     inputText: string,
 }
 
+interface Activity {
+    name: string,
+    address: string,
+}
+
+interface Flight {
+    outbound: {
+        datetime: string
+        number: string
+        seats: {
+            number: string
+        }[]
+    },
+    inbound: {
+        datetime: string
+        number: string
+        seats: {
+            number: string
+        }[]
+    }
+}
+
+interface User {
+    firstName: string,
+    lastName: string,
+    telNo: number,
+    email: string,
+}
+
+
 interface AgentResponse {
-    hotels: Hotel[]
+    activities: Activity[] | null,
+    hotels: Hotel[] | null,
+    flight: Flight | null,
+    user: User | null
 }
 
 enum AgentStatus {
@@ -80,10 +113,18 @@ export function MainContent(): React.JSX.Element {
     }, [])
 
     const [messages, setMessages] = useState<Message[]>([]);
+    const [isRenderUserMessage, setIsRenderUserMessage] = useState(false);
     const [input, setInput] = useState('');
     const [isSending, setIsSending] = useState(false);
     const [inputAreaStyle, setInputAreaStyle] = useState(inputAreaStyles.active)
     const [isInputAreaDisabled, setIsInputAreaDisabled] = useState(false)
+
+    useEffect(() => {
+        if (isRenderUserMessage) {
+            setInput('');
+            setIsRenderUserMessage(false);
+        }
+    }, [isRenderUserMessage]);
 
     /**
      * チャット反映
@@ -121,8 +162,8 @@ export function MainContent(): React.JSX.Element {
             sender: 'user',
             element: <>{text}</>,
         };
-        setInput('');
         setMessages((prev) => [...prev, userMessage]);
+        setIsRenderUserMessage(true);
     }
 
     /**
@@ -154,14 +195,16 @@ export function MainContent(): React.JSX.Element {
 
                 if (planCreationStatus.inProgressAgent == Agent.HOTEL) {
                     planCreationStatus.hotel = AgentStatus.IN_PROGRESS
-                    const response = await client.queries.recommendationsHotels(request);
-                    return response.data
+                    return (await client.queries.recommendationHotels(request)).data;
                 } else if (planCreationStatus.inProgressAgent == Agent.ACTIVITY) {
-                    console.log('activity')
+                    planCreationStatus.activity = AgentStatus.IN_PROGRESS
+                    return (await client.queries.recommendationActivities(request)).data
                 } else if (planCreationStatus.inProgressAgent == Agent.FLIGHT) {
-                    console.log('flight')
+                    planCreationStatus.flight = AgentStatus.IN_PROGRESS
+                    return (await client.queries.recommendationsFlight(request)).data
                 } else if (planCreationStatus.inProgressAgent == Agent.USER) {
-                    console.log('user')
+                    planCreationStatus.user = AgentStatus.IN_PROGRESS
+                    return (await client.queries.confirmUserInfo(request)).data
                 } else if (planCreationStatus.inProgressAgent == Agent.BOOKING) {
                     console.log('booking')
                 }
@@ -184,10 +227,28 @@ export function MainContent(): React.JSX.Element {
         if (isJsonParsable(convertedResponse)) {
             const parsedResponse: AgentResponse = JSON.parse(convertedResponse)
 
-            if ('hotels' in parsedResponse) {
+            if (planCreationStatus.inProgressAgent == Agent.HOTEL && parsedResponse.hotels) {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
-                element = <HotelElement hotels={parsedResponse.hotels} onHotelRegistered={onHotelRegistered} />
+                element = <HotelElement hotels={parsedResponse.hotels} onHotelRegistered={onHotelRegistered}/>
+
+            } else if (planCreationStatus.inProgressAgent == Agent.ACTIVITY && parsedResponse.activities) {
+                setInputAreaStyle(inputAreaStyles.inactive)
+                setIsInputAreaDisabled(true)
+                console.log('activities')
+
+            } else if (planCreationStatus.inProgressAgent == Agent.FLIGHT && parsedResponse.flight) {
+                setInputAreaStyle(inputAreaStyles.inactive)
+                setIsInputAreaDisabled(true)
+                console.log('flight')
+
+            } else if (planCreationStatus.inProgressAgent == Agent.USER && parsedResponse.user) {
+                setInputAreaStyle(inputAreaStyles.inactive)
+                setIsInputAreaDisabled(true)
+                console.log('user')
+
+            } else {
+                element = <>{convertedResponse}</>
             }
         } else {
             element = <>{convertedResponse}</>
