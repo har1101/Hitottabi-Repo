@@ -7,7 +7,7 @@ import SendIcon from '@mui/icons-material/Send';
 interface Props {
     input: string;
     setInput: (input: string) => void;
-    sendMessage: () => void;
+    sendMessage: (input: string, isRender: boolean) => void;
     inputAreaStyle: object
     isInputAreaDisabled: boolean
 }
@@ -32,7 +32,8 @@ const innerBoxStyles = {
     padding: 2
 };
 
-export function ChatInputArea({input, setInput, sendMessage, inputAreaStyle, isInputAreaDisabled}: Props) {
+export function ChatInputArea(
+    {input, setInput, sendMessage, inputAreaStyle, isInputAreaDisabled}: Props) {
 
     /**
      * Shift + Enterキーを押下した時にメッセージが送信される
@@ -41,7 +42,7 @@ export function ChatInputArea({input, setInput, sendMessage, inputAreaStyle, isI
     const handleKeyPress = (e: React.KeyboardEvent): void => {
         if (e.shiftKey && e.key === 'Enter') {
             e.preventDefault();
-            sendMessage();
+            sendMessage(input, true);
         }
     };
 
@@ -60,7 +61,7 @@ export function ChatInputArea({input, setInput, sendMessage, inputAreaStyle, isI
                     sx={inputAreaStyle}
                     disabled={isInputAreaDisabled}
                 />
-                <IconButton color="primary" onClick={sendMessage} sx={{ml: 1}}>
+                <IconButton color="primary" onClick={() => sendMessage(input, true)} sx={{ml: 1}}>
                     <SendIcon/>
                 </IconButton>
             </Box>
