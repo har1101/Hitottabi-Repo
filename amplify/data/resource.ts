@@ -65,7 +65,7 @@ const schema = a.schema({
                 price: a.string().required(),
                 seats: a.string().array().required()
             })
-        })
+        }),
         TravelBasic: a.customType({
             outbound: a.customType({
                 location: a.string(),

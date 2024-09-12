@@ -90,7 +90,7 @@ interface AgentResponse {
     travelBasic: TravelBasic | null
     activities: Activity[] | null
     hotels: Hotel[] | null
-    // flight: Flight | null
+    flight: Flight | null
     // user: User | null
 }
 
