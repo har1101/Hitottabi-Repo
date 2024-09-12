@@ -27,7 +27,7 @@ export interface Flight {
 
 interface Props {
     flights: Flight;
-    onFlightRegisterd: () => void
+    onFlightRegistered: () => void
 }
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -42,8 +42,8 @@ const Item = styled(Paper)(({ theme }) => ({
     }),
 }));
 
-export function FlightElement({flights, onFlightRegisterd}: Props): React.JSX.Element {
-    const [isRegisted, setIsRegisted] = useState<boolean>(false)
+export function FlightElement({flights, onFlightRegistered}: Props): React.JSX.Element {
+    const [isRegistered, setIsRegistered] = useState<boolean>(false)
     const registerFlight = () => {
         const sessionId = sessionStorage.getItem('sessionId')
         if (!sessionId) {
@@ -72,8 +72,8 @@ export function FlightElement({flights, onFlightRegisterd}: Props): React.JSX.El
                 }
             }
         })
-        setIsRegisted(true)
-        onFlightRegisterd()
+        setIsRegistered(true)
+        onFlightRegistered()
     }
 
     return (
@@ -170,10 +170,10 @@ export function FlightElement({flights, onFlightRegisterd}: Props): React.JSX.El
                 </Grid>
             </Box>
             <Box mt={2}>
-                <Button disabled={isRegisted} variant="contained" color="primary" sx={{mx: 1}} onClick={registerFlight}>
+                <Button disabled={isRegistered} variant="contained" color="primary" sx={{mx: 1}} onClick={registerFlight}>
                     OK
                 </Button>
-                <Button disabled={isRegisted} variant="contained" color="secondary" sx={{mx: 1}}>
+                <Button disabled={isRegistered} variant="contained" color="secondary" sx={{mx: 1}}>
                     価格を下げたい
                 </Button>
             </Box>

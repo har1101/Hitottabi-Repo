@@ -12,7 +12,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(recommendationActivities))
         .authorization(allow => [allow.publicApiKey()]),
     recommendationHotels: a
@@ -22,7 +21,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(recommendationHotels))
         .authorization(allow => [allow.publicApiKey()]),
     recommendationsFlight: a
@@ -32,7 +30,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(recommendationFlight))
         .authorization(allow => [allow.publicApiKey()]),
     confirmUserInfo: a
@@ -42,7 +39,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(confirmUserInfo))
         .authorization(allow => [allow.publicApiKey()]),
     Plan: a.model({
@@ -65,7 +61,7 @@ const schema = a.schema({
                 price: a.string().required(),
                 seats: a.string().array().required()
             })
-        })
+        }),
         TravelBasic: a.customType({
             outbound: a.customType({
                 location: a.string(),
