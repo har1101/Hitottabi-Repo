@@ -10,7 +10,7 @@ import { v4 as uuid } from "uuid";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
 import { Message } from "../ChatMessage.tsx";
-import { Flight, FlightElement } from '../element/FlightElement.tsx';
+import { Flight } from '../element/FlightElement.tsx';
 import { Activity, ActivityElement } from "../element/ActivityElement.tsx";
 
 
@@ -35,7 +35,7 @@ export interface Plan {
     travelBasic: TravelBasic | null
     activity: Activity | null
     hotel: Hotel | null
-    // flight: Flight | null
+    flight: Flight | null
     // user: User | null
 }
 
@@ -126,7 +126,7 @@ const plan: Plan = {
     travelBasic: null,
     activity: null,
     hotel: null,
-    // flight: null,
+    flight: null,
     // user: null
 }
 
@@ -265,20 +265,20 @@ export function MainContent(): React.JSX.Element {
         await sendMessage('旅行がしたい', false)
     }
 
-    const onFlightRegistered = () => {
-        setInputAreaStyle(inputAreaStyles.active)
-        setIsInputAreaDisabled(false)
-
-        planCreationStatus.flight = AgentStatus.COMPLETED
-        //planCreationStatus.inProgressAgent = Agent.FLIGHT
-
-        const aiMessage: Message = {
-            id: uuid(),
-            sender: 'ai',
-            element: <>飛行機の登録が完了しました！</>,
-        };
-        render(aiMessage)
-    }
+    // const onFlightRegistered = () => {
+    //     setInputAreaStyle(inputAreaStyles.active)
+    //     setIsInputAreaDisabled(false)
+    //
+    //     planCreationStatus.flight = AgentStatus.COMPLETED
+    //     //planCreationStatus.inProgressAgent = Agent.FLIGHT
+    //
+    //     const aiMessage: Message = {
+    //         id: uuid(),
+    //         sender: 'ai',
+    //         element: <>飛行機の登録が完了しました！</>,
+    //     };
+    //     render(aiMessage)
+    // }
 
     /**
      * ユーザーの入力値を画面に反映
