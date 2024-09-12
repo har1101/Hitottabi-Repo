@@ -1,9 +1,10 @@
 import type { Schema } from "../../data/resource"
+import { executeAgent } from "../common";
 
 
-export const handler: Schema["recommendationActivities"]["functionHandler"] = async (event) => {
-    const {sessionId, inputText} = event.arguments
-    console.log(sessionId)
-    console.log(inputText)
-    return JSON.stringify("{}")
-}
+const AGENT_ID: string = "0YPTLEN7Y2"
+const AGENT_ALIAS_ID: string = "PJQ80WZBZX"
+
+export const handler: Schema["recommendationActivities"]["functionHandler"] =
+    async (event) => executeAgent(event, AGENT_ID, AGENT_ALIAS_ID)
+

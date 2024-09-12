@@ -11,53 +11,10 @@ import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
 import { Message } from "../ChatMessage.tsx";
 import { Flight, FlightElement } from '../element/FlightElement.tsx';
+import { Activity, ActivityElement } from "../element/ActivityElement.tsx";
 
 
 const client = generateClient<Schema>();
-
-interface AgentRequest {
-    sessionId: string,
-    inputText: string,
-}
-
-interface Activity {
-    name: string,
-    address: string,
-}
-
-// interface Flight {
-//     outbound: {
-//         datetime: string
-//         number: string
-//         seats: {
-//             number: string
-//             class: string
-//         }[]
-//     },
-//     inbound: {
-//         datetime: string
-//         number: string
-//         seats: {
-//             number: string
-//             class: string
-//         }[]
-//     }
-// }
-
-interface User {
-    firstName: string,
-    lastName: string,
-    telNo: number,
-    email: string,
-}
-
-
-interface AgentResponse {
-    activities: Activity[] | null,
-    hotels: Hotel[] | null,
-    flight: Flight | null,
-    user: User | null
-}
 
 enum AgentStatus {
     PENDING, // 未処理
@@ -72,6 +29,69 @@ enum Agent {
     FLIGHT = 'flight',
     USER = 'user',
     BOOKING = 'booking'
+}
+
+export interface Plan {
+    travelBasic: TravelBasic | null
+    activity: Activity | null
+    hotel: Hotel | null
+    // flight: Flight | null
+    // user: User | null
+}
+
+interface TravelBasic {
+    outbound: {
+        location: string
+        date: string
+    }
+    inbound: {
+        location: string
+        date: string
+    }
+    people: {
+        adults: number
+        children: number
+        infants: number
+    }
+}
+
+
+interface AgentRequest {
+    sessionId: string,
+    inputText: string,
+}
+
+// interface Flight {
+//     outbound: {
+//         datetime: string
+//         number: string
+//         seats: {
+//             number: string
+//         }[]
+//     },
+//     inbound: {
+//         datetime: string
+//         number: string
+//         seats: {
+//             number: string
+//         }[]
+//     }
+// }
+
+// interface User {
+//     firstName: string,
+//     lastName: string,
+//     telNo: number,
+//     email: string,
+// }
+
+
+interface AgentResponse {
+    travelBasic: TravelBasic | null
+    activities: Activity[] | null
+    hotels: Hotel[] | null
+    // flight: Flight | null
+    // user: User | null
 }
 
 interface PlanCreationStatus {
@@ -101,6 +121,14 @@ const inputAreaStyles = {
         },
     }
 };
+
+const plan: Plan = {
+    travelBasic: null,
+    activity: null,
+    hotel: null,
+    // flight: null,
+    // user: null
+}
 
 const planCreationStatus: PlanCreationStatus = {
     inProgressAgent: Agent.NONE,
@@ -137,22 +165,108 @@ export function MainContent(): React.JSX.Element {
         setMessages((prev) => [...prev, aiMessage]);
     }
 
+
+    /**
+     * プランをDBへ登録
+     * @param plan
+     */
+    const registerPlanToDB = async (plan: Plan) => {
+        const sessionId = sessionStorage.getItem('sessionId');
+        if (!sessionId) {
+            console.log('The session ID is invalid.')
+            return;
+        }
+
+        const response = (await client.models.Plan.get({PK: sessionId, SK: 'test'})).data
+
+        if (response) {
+            await client.models.Plan.update({
+                PK: sessionId,
+                SK: 'test',
+                TravelBasic: plan.travelBasic ? {
+                    outbound: {
+                        location: plan.travelBasic.outbound.location,
+                        date: plan.travelBasic.outbound.date
+                    },
+                    inbound: {
+                        location: plan.travelBasic.inbound.location,
+                        date: plan.travelBasic.inbound.date
+                    },
+                    people: {
+                        adults: plan.travelBasic.people.adults ? plan.travelBasic.people.adults : 0,
+                        children: plan.travelBasic.people.children ? plan.travelBasic.people.children : 0,
+                        infants: plan.travelBasic.people.infants ? plan.travelBasic.people.infants : 0
+                    }
+                } : {},
+                Activity: {
+                    name: plan.activity?.name,
+                    description: plan.activity?.description
+                },
+                Hotel: plan.hotel ? {
+                    name: plan.hotel.name,
+                    description: plan.hotel.description
+                } : {},
+            })
+        } else {
+            await client.models.Plan.create({
+                PK: sessionId,
+                SK: 'test',
+                TravelBasic: plan.travelBasic ? {
+                    outbound: {
+                        location: plan.travelBasic.outbound.location,
+                        date: plan.travelBasic.outbound.date
+                    },
+                    inbound: {
+                        location: plan.travelBasic.inbound.location,
+                        date: plan.travelBasic.inbound.date
+                    },
+                    people: {
+                        adults: plan.travelBasic.people.adults ? plan.travelBasic.people.adults : 0,
+                        children: plan.travelBasic.people.children ? plan.travelBasic.people.children : 0,
+                        infants: plan.travelBasic.people.infants ? plan.travelBasic.people.infants : 0
+                    }
+                } : {},
+                Activity: plan.activity ? {
+                    name: plan.activity.name,
+                    description: plan.activity.description
+                } : {},
+                Hotel: plan.hotel ? {
+                    name: plan.hotel.name,
+                    description: plan.hotel.description
+                } : {},
+            })
+        }
+    }
+
+
     /**
      * ホテル登録完了後
      */
-    const onHotelRegistered = () => {
+    const onHotelRegistered = async () => {
+        setInputAreaStyle(inputAreaStyles.active)
+        setIsInputAreaDisabled(false)
+
+        planCreationStatus.hotel = AgentStatus.COMPLETED
+        planCreationStatus.inProgressAgent = Agent.ACTIVITY
+
+        await sendMessage('旅行がしたい', false)
+    }
+
+    /**
+     * アクティビティ登録完了後
+     */
+    const onActivityRegistered = async () => {
         setInputAreaStyle(inputAreaStyles.active)
         setIsInputAreaDisabled(false)
 
         planCreationStatus.hotel = AgentStatus.COMPLETED
         planCreationStatus.inProgressAgent = Agent.FLIGHT
-
-        const aiMessage: Message = {
+        const userMessage: Message = {
             id: uuid(),
-            sender: 'ai',
-            element: <>ホテル登録完了</>,
+            sender: 'user',
+            element: <>アクティビティ登録完了</>,
         };
-        render(aiMessage)
+        setMessages((prev) => [...prev, userMessage]);
     }
 
     const onFlightRegisterd = () => {
@@ -173,14 +287,18 @@ export function MainContent(): React.JSX.Element {
     /**
      * ユーザーの入力値を画面に反映
      * @param text
+     * @param isRender
      */
-    const renderUserMessage = (text: string) => {
+    const renderUserMessage = (text: string, isRender: boolean) => {
         const userMessage: Message = {
             id: uuid(),
             sender: 'user',
             element: <>{text}</>,
         };
-        setMessages((prev) => [...prev, userMessage]);
+
+        if (isRender) {
+            setMessages((prev) => [...prev, userMessage]);
+        }
         setIsRenderUserMessage(true);
     }
 
@@ -197,17 +315,21 @@ export function MainContent(): React.JSX.Element {
             } else {
                 const request: AgentRequest = {
                     sessionId: sessionId,
-                    inputText: text,
+                    // 別のエージェントの一部の入力値を引き継いだ上で、エージェントを呼び出すための処理
+                    inputText: plan.travelBasic ? text + " " + JSON.stringify(plan.travelBasic) : text,
                 }
 
                 if (planCreationStatus.inProgressAgent == Agent.NONE) {
                     // ユーザーの入力に応じてどのホテル or アクティビティエージェントから呼び出すか判断するエージェントを呼び出す
-                    const response = 'hotel'
+                    const response = Agent.HOTEL
 
                     switch (response) {
                         case Agent.HOTEL:
                             planCreationStatus.inProgressAgent = Agent.HOTEL;
                             break;
+                        // case Agent.ACTIVITY:
+                        //     planCreationStatus.inProgressAgent = Agent.ACTIVITY;
+                        //     break;
                     }
                 }
 
@@ -240,20 +362,32 @@ export function MainContent(): React.JSX.Element {
 
         const convertedResponse: string = convertNonNullableValue(response)
 
-        let element: React.JSX.Element = <></>;
+        let element: React.JSX.Element;
 
         if (isJsonParsable(convertedResponse)) {
             const parsedResponse: AgentResponse = JSON.parse(convertedResponse)
 
+            if (parsedResponse.travelBasic) {
+                plan.travelBasic = parsedResponse.travelBasic
+            }
+
             if (planCreationStatus.inProgressAgent == Agent.HOTEL && parsedResponse.hotels) {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
-                element = <HotelElement hotels={parsedResponse.hotels} onHotelRegistered={onHotelRegistered}/>
+                element = <HotelElement plan={plan}
+                                        hotels={parsedResponse.hotels}
+                                        registerPlanToDB={registerPlanToDB}
+                                        onHotelRegistered={onHotelRegistered}/>
 
             } else if (planCreationStatus.inProgressAgent == Agent.ACTIVITY && parsedResponse.activities) {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
-                console.log('activities')
+                element =
+                    <ActivityElement plan={plan}
+                                    activities={parsedResponse.activities}
+                                    registerPlanToDB={registerPlanToDB}
+                                    onActivityRegistered={onActivityRegistered}>
+                    </ActivityElement>
 
             } else if (planCreationStatus.inProgressAgent == Agent.FLIGHT && parsedResponse.flight) {
                 setInputAreaStyle(inputAreaStyles.inactive)
@@ -284,10 +418,10 @@ export function MainContent(): React.JSX.Element {
     /**
      * ユーザーの入力をエージェントに送信する
      */
-    const sendMessage = async () => {
+    const sendMessage = async (input: string, isRender: boolean) => {
         if (!input.trim() || isSending) return;
         setIsSending(true);
-        renderUserMessage(input);
+        renderUserMessage(input, isRender);
 
         try {
             const response: Nullable<string> | undefined = await executeAgent(input)
