@@ -48,10 +48,6 @@ const schema = a.schema({
     Plan: a.model({
         PK: a.id().required(),
         SK: a.string().required(),
-        Hotel: a.customType({
-            name: a.string().required(),
-            description: a.string().required(),
-        }),
         Flight: a.customType({
             departure: a.customType({
                 flight_number: a.string().required(),

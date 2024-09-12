@@ -395,10 +395,10 @@ export function MainContent(): React.JSX.Element {
                 console.log('flight')
                 element = <FlightElement flights={parsedResponse.flight} onFlightRegisterd={onFlightRegisterd}/>
 
-            } else if (planCreationStatus.inProgressAgent == Agent.USER && parsedResponse.user) {
-                setInputAreaStyle(inputAreaStyles.inactive)
-                setIsInputAreaDisabled(true)
-                console.log('user')
+            // } else if (planCreationStatus.inProgressAgent == Agent.USER && parsedResponse.user) {
+            //     setInputAreaStyle(inputAreaStyles.inactive)
+            //     setIsInputAreaDisabled(true)
+            //     element = <>{convertedResponse}</>
 
             } else {
                 element = <>{convertedResponse}</>
