@@ -1,182 +1,157 @@
-import React, { useState } from "react";
-import { styled } from "@mui/material/styles"
-import { Box, Container, Grid, Paper, Divider, Button } from "@mui/material";
-import { generateClient } from "@aws-amplify/api";
-import type { Schema } from "../../../amplify/data/resource"
+import {
+    Box,
+    Paper,
+    TableContainer,
+    Table,
+    TableBody,
+    TableRow, TableCell, Button
+} from "@mui/material";
+import { Plan } from "../section/MainContent.tsx";
 
-const client = generateClient<Schema>();
+
+
 
 export interface Flight {
-    departure: {
-        flight_number: string,
+    outbound: {
         airport: string
-        seats: { seat: string, seat_class: string }[]
-        departure_time: string
-        arrival_time: string
-        price: string
+        number: string
+        startTime: string
+        endTime: string
+        seats: Seat[]
     },
-    return: {
-        flight_number: string,
+    inbound: {
         airport: string
-        seats: { seat: string, seat_class: string }[]
-        departure_time: string
-        arrival_time: string
-        price: string
+        number: string
+        startTime: string
+        endTime: string
+        seats: Seat[]
     }
+}
+
+interface Seat {
+    number: string
+    class: string
 }
 
 interface Props {
-    flights: Flight;
-    onFlightRegistered: () => void
+    plan: Plan;
+    flight: Flight;
+    registerPlanToDB: (plan: Plan) => void
+    onFlightRegistered: (plan: Plan) => void
 }
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: '#E0FFFF',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    borderRadius:0,
-    color: theme.palette.text.secondary,
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#E0FFFF',
-    }),
-}));
+export function FlightElement({plan, flight, registerPlanToDB, onFlightRegistered}: Props): React.JSX.Element {
 
-export function FlightElement({flights, onFlightRegistered}: Props): React.JSX.Element {
-    const [isRegistered, setIsRegistered] = useState<boolean>(false)
+    /**
+     * ホテル登録イベント
+     */
     const registerFlight = () => {
-        const sessionId = sessionStorage.getItem('sessionId')
-        if (!sessionId) {
-            console.log('The session ID is invalid.')
-            return;
-        }
-        client.models.Plan.update({
-            PK: sessionId,
-            SK: 'Metadata',
-            Flight: {
-                departure: {
-                    flight_number: flights.departure.flight_number,
-                    departure_airport: flights.departure.airport,
-                    departure_time: flights.departure.departure_time,
-                    arrival_time: flights.departure.arrival_time,
-                    price: flights.departure.price,
-                    seats: flights.departure.seats.map(item => item.seat)
-                },
-                return: {
-                    flight_number: flights.departure.flight_number,
-                    departure_airport: flights.departure.airport,
-                    departure_time: flights.departure.departure_time,
-                    arrival_time: flights.departure.arrival_time,
-                    price: flights.departure.price,
-                    seats: flights.departure.seats.map(item => item.seat)
-                }
-            }
-        })
-        setIsRegistered(true)
-        onFlightRegistered()
+        plan.flight = flight
+
+        registerPlanToDB(plan)
+
+        // コールバック関数
+        onFlightRegistered(plan)
     }
 
     return (
-        <Container>
-            <Box sx={{padding:1}}>往路便</Box>
-            <Box id="departure-flight"
-                sx={{
-                    flexFlow: 1,
-                    bgcolor: "",
-                    borderRadius: 3,
-                    paddingTop:0
-                }}
-            >
-                <Grid container rowSpacing={0} columnSpacing={0}>
-                    <Grid item xs={4}>
-                        <Item>便名</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.departure.flight_number}</Item>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Item>出発</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.departure.airport}</Item>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Item>時間</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.departure.departure_time}-{flights.departure.arrival_time}</Item>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Item>座席</Item>
-                    </Grid>
-                        <Grid item xs={8}>
-                            <Item>
-                                {flights.departure.seats.map(seat => (
-                                    <Box key={seat.seat}>{seat.seat}：{seat.seat_class}</Box>
-                                ))}
-                            </Item>
-                        </Grid>
-                    <Grid item xs={4}>
-                        <Item>料金</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.departure.price}円</Item>
-                    </Grid>
-                </Grid>
-            </Box>
-            <Divider sx={{padding:1}}/>
-            <Box sx={{padding:1}}>復路便</Box>
-            <Box id="return-flight"
-                sx={{
-                    flexFlow: 1,
-                    borderRadius: 3,
-                }}
-            >
-                <Grid container rowSpacing={0} columnSpacing={0}>
-                    <Grid item xs={4}>
-                        <Item>便名</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.return.flight_number}</Item>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Item>出発</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.return.airport}</Item>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Item>時間</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.return.departure_time}-{flights.return.arrival_time}</Item>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Item>座席</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                            <Item>
-                                {flights.return.seats.map(seat => (
-                                    <Box key={seat.seat}>{seat.seat}：{seat.seat_class}</Box>
-                                ))}
-                            </Item>
-                        </Grid>
-                    <Grid item xs={4}>
-                        <Item>料金</Item>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Item>{flights.return.price}円</Item>
-                    </Grid>
-                </Grid>
+        <Box>
+            <Box>条件に合う往路、帰路が見つかりました。</Box>
+            <Box display="flex">
+                <Box mt={2}>
+                    <Box>往路</Box>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>空港</TableCell>
+                                    <TableCell>{flight.outbound.airport}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>便</TableCell>
+                                    <TableCell>{flight.outbound.number}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>出発時間</TableCell>
+                                    <TableCell>{flight.outbound.startTime}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>到着時間</TableCell>
+                                    <TableCell>{flight.outbound.endTime}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>席</TableCell>
+                                    <TableCell>
+                                        <TableContainer component={Paper}>
+                                            <Table>
+                                                <TableBody>
+                                                    {
+                                                        flight.outbound.seats.map((seat, index) => (
+                                                            <TableRow key={index}>
+                                                                <TableCell>{seat.number}</TableCell>
+                                                                <TableCell>{seat.class}</TableCell>
+                                                            </TableRow>
+                                                        ))
+                                                    }
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Box>
+                <Box mt={2} ml={2}>
+                    <Box>帰路</Box>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>空港</TableCell>
+                                    <TableCell>{flight.inbound.airport}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>便</TableCell>
+                                    <TableCell>{flight.inbound.number}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>出発時間</TableCell>
+                                    <TableCell>{flight.inbound.startTime}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>到着時間</TableCell>
+                                    <TableCell>{flight.inbound.endTime}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>席</TableCell>
+                                    <TableCell>
+                                        <TableContainer component={Paper}>
+                                            <Table>
+                                                <TableBody>
+                                                    {
+                                                        flight.inbound.seats.map((seat, index) => (
+                                                            <TableRow key={index}>
+                                                                <TableCell>{seat.number}</TableCell>
+                                                                <TableCell>{seat.class}</TableCell>
+                                                            </TableRow>
+                                                        ))
+                                                    }
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Box>
             </Box>
             <Box mt={2}>
-                <Button disabled={isRegistered} variant="contained" color="primary" sx={{mx: 1}} onClick={registerFlight}>
+                <Button variant="contained" color="primary" sx={{mx: 1}} onClick={registerFlight}>
                     OK
                 </Button>
-                <Button disabled={isRegistered} variant="contained" color="secondary" sx={{mx: 1}}>
-                    価格を下げたい
-                </Button>
             </Box>
-        </Container>
+        </Box>
     )
 }
