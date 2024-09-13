@@ -1,8 +1,9 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
 import { recommendationHotels } from "../functions/recommendationHotels/resource"
-import { recommendationActivities } from "../functions/recommendationActivities/resource.ts";
-import { recommendationFlight } from "../functions/recommendationFlight/resource.ts";
-import { confirmUserInfo } from "../functions/confirmUserInfo/resource.ts";
+import { recommendationActivities } from "../functions/recommendationActivities/resource";
+import { recommendationFlight } from "../functions/recommendationFlight/resource";
+import { confirmUserInfo } from "../functions/confirmUserInfo/resource";
+import { sendMessage } from "../functions/sendMessage/resource"
 
 const schema = a.schema({
     recommendationActivities: a
@@ -40,6 +41,12 @@ const schema = a.schema({
         })
         .returns(a.string())
         .handler(a.handler.function(confirmUserInfo))
+        .authorization(allow => [allow.publicApiKey()]),
+    sendMessage: a
+        .mutation()
+        .arguments({sessionId: a.string().required()})
+        .returns(a.string())
+        .handler(a.handler.function(sendMessage))
         .authorization(allow => [allow.publicApiKey()]),
     Plan: a.model({
         PK: a.id().required(),

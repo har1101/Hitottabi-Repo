@@ -120,7 +120,32 @@ export function MainContent(): React.JSX.Element {
         if (!sessionId) {
             sessionStorage.setItem('sessionId', uuid());
         }
+
+        const element = (
+            <Box>
+                <Button variant="contained" color="primary" sx={{mx: 1}} onClick={sendQueue}>
+                    キューを送信する
+                </Button>
+            </Box>
+        )
+
+        const aiMessage: Message = {
+            id: uuid(),
+            sender: 'ai',
+            element: element,
+        };
+        render(aiMessage)
     }, [])
+
+    const sendQueue = (async () => {
+        const sessionId = sessionStorage.getItem('sessionId');
+        if (sessionId) {
+            const response = (await client.mutations.sendMessage({
+                sessionId: sessionId
+            })).data
+            console.log(response)
+        }
+    })
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [isRenderUserMessage, setIsRenderUserMessage] = useState(false);
