@@ -10,7 +10,7 @@ import { v4 as uuid } from "uuid";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
 import { Message } from "../ChatMessage.tsx";
-import { Flight } from '../element/FlightElement.tsx';
+import { Flight, FlightElement } from '../element/FlightElement.tsx';
 import { Activity, ActivityElement } from "../element/ActivityElement.tsx";
 
 
@@ -60,30 +60,6 @@ interface AgentRequest {
     sessionId: string,
     inputText: string,
 }
-
-// interface Flight {
-//     outbound: {
-//         datetime: string
-//         number: string
-//         seats: {
-//             number: string
-//         }[]
-//     },
-//     inbound: {
-//         datetime: string
-//         number: string
-//         seats: {
-//             number: string
-//         }[]
-//     }
-// }
-
-// interface User {
-//     firstName: string,
-//     lastName: string,
-//     telNo: number,
-//     email: string,
-// }
 
 
 interface AgentResponse {
@@ -140,7 +116,10 @@ const planCreationStatus: PlanCreationStatus = {
 
 export function MainContent(): React.JSX.Element {
     useEffect(() => {
-        sessionStorage.setItem('sessionId', uuid())
+        const sessionId = sessionStorage.getItem('sessionId');
+        if (!sessionId) {
+            sessionStorage.setItem('sessionId', uuid());
+        }
     }, [])
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -177,64 +156,41 @@ export function MainContent(): React.JSX.Element {
             return;
         }
 
+        const planData = {
+            PK: sessionId,
+            SK: 'test',
+            TravelBasic: plan.travelBasic ? {
+                outbound: {
+                    location: plan.travelBasic.outbound.location,
+                    date: plan.travelBasic.outbound.date
+                },
+                inbound: {
+                    location: plan.travelBasic.inbound.location,
+                    date: plan.travelBasic.inbound.date
+                },
+                people: {
+                    adults: plan.travelBasic.people.adults || 0,
+                    children: plan.travelBasic.people.children || 0,
+                    infants: plan.travelBasic.people.infants || 0
+                }
+            } : {},
+            Activity: plan.activity ? {
+                name: plan.activity.name,
+                description: plan.activity.description
+            } : {},
+            Hotel: plan.hotel ? {
+                name: plan.hotel.name,
+                description: plan.hotel.description
+            } : {},
+        };
+
+
         const response = (await client.models.Plan.get({PK: sessionId, SK: 'test'})).data
 
         if (response) {
-            await client.models.Plan.update({
-                PK: sessionId,
-                SK: 'test',
-                TravelBasic: plan.travelBasic ? {
-                    outbound: {
-                        location: plan.travelBasic.outbound.location,
-                        date: plan.travelBasic.outbound.date
-                    },
-                    inbound: {
-                        location: plan.travelBasic.inbound.location,
-                        date: plan.travelBasic.inbound.date
-                    },
-                    people: {
-                        adults: plan.travelBasic.people.adults ? plan.travelBasic.people.adults : 0,
-                        children: plan.travelBasic.people.children ? plan.travelBasic.people.children : 0,
-                        infants: plan.travelBasic.people.infants ? plan.travelBasic.people.infants : 0
-                    }
-                } : {},
-                Activity: {
-                    name: plan.activity?.name,
-                    description: plan.activity?.description
-                },
-                Hotel: plan.hotel ? {
-                    name: plan.hotel.name,
-                    description: plan.hotel.description
-                } : {},
-            })
+            await client.models.Plan.update(planData);
         } else {
-            await client.models.Plan.create({
-                PK: sessionId,
-                SK: 'test',
-                TravelBasic: plan.travelBasic ? {
-                    outbound: {
-                        location: plan.travelBasic.outbound.location,
-                        date: plan.travelBasic.outbound.date
-                    },
-                    inbound: {
-                        location: plan.travelBasic.inbound.location,
-                        date: plan.travelBasic.inbound.date
-                    },
-                    people: {
-                        adults: plan.travelBasic.people.adults ? plan.travelBasic.people.adults : 0,
-                        children: plan.travelBasic.people.children ? plan.travelBasic.people.children : 0,
-                        infants: plan.travelBasic.people.infants ? plan.travelBasic.people.infants : 0
-                    }
-                } : {},
-                Activity: plan.activity ? {
-                    name: plan.activity.name,
-                    description: plan.activity.description
-                } : {},
-                Hotel: plan.hotel ? {
-                    name: plan.hotel.name,
-                    description: plan.hotel.description
-                } : {},
-            })
+            await client.models.Plan.create(planData);
         }
     }
 
@@ -265,20 +221,15 @@ export function MainContent(): React.JSX.Element {
         await sendMessage('旅行がしたい', false)
     }
 
-    // const onFlightRegistered = () => {
-    //     setInputAreaStyle(inputAreaStyles.active)
-    //     setIsInputAreaDisabled(false)
-    //
-    //     planCreationStatus.flight = AgentStatus.COMPLETED
-    //     //planCreationStatus.inProgressAgent = Agent.FLIGHT
-    //
-    //     const aiMessage: Message = {
-    //         id: uuid(),
-    //         sender: 'ai',
-    //         element: <>飛行機の登録が完了しました！</>,
-    //     };
-    //     render(aiMessage)
-    // }
+    const onFlightRegistered = async () => {
+        setInputAreaStyle(inputAreaStyles.active)
+        setIsInputAreaDisabled(false)
+
+        planCreationStatus.flight = AgentStatus.COMPLETED
+        // planCreationStatus.inProgressAgent = Agent.HOTEL
+
+        // await sendMessage('旅行がしたい', false)
+    }
 
     /**
      * ユーザーの入力値を画面に反映
@@ -368,23 +319,20 @@ export function MainContent(): React.JSX.Element {
             } else if (planCreationStatus.inProgressAgent == Agent.ACTIVITY && parsedResponse.activities) {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
-                element =
-                    <ActivityElement plan={plan}
-                                    activities={parsedResponse.activities}
-                                    registerPlanToDB={registerPlanToDB}
-                                    onActivityRegistered={onActivityRegistered}>
-                    </ActivityElement>
+                element = <ActivityElement plan={plan}
+                                           activities={parsedResponse.activities}
+                                           registerPlanToDB={registerPlanToDB}
+                                           onActivityRegistered={onActivityRegistered}>
+                </ActivityElement>
 
             } else if (planCreationStatus.inProgressAgent == Agent.FLIGHT && parsedResponse.flight) {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
-                element = <>{convertedResponse}</>
-                // element = <FlightElement flights={parsedResponse.flight} onFlightRegistered={onFlightRegistered}/>
-
-            // } else if (planCreationStatus.inProgressAgent == Agent.USER && parsedResponse.user) {
-            //     setInputAreaStyle(inputAreaStyles.inactive)
-            //     setIsInputAreaDisabled(true)
-            //     element = <>{convertedResponse}</>
+                // element = <>{convertedResponse}</>
+                element = <FlightElement plan={plan}
+                                         flight={parsedResponse.flight}
+                                         registerPlanToDB={registerPlanToDB}
+                                         onFlightRegistered={onFlightRegistered}/>
 
             } else {
                 element = <>{convertedResponse}</>
