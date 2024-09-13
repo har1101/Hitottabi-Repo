@@ -44,24 +44,6 @@ const schema = a.schema({
     Plan: a.model({
         PK: a.id().required(),
         SK: a.string().required(),
-        Flight: a.customType({
-            departure: a.customType({
-                flight_number: a.string().required(),
-                departure_airport: a.string().required(),
-                departure_time: a.string().required(),
-                arrival_time: a.string().required(),
-                price: a.string().required(),
-                seats: a.string().array().required()
-            }),
-            return: a.customType({
-                flight_number: a.string().required(),
-                departure_airport: a.string().required(),
-                departure_time: a.string().required(),
-                arrival_time: a.string().required(),
-                price: a.string().required(),
-                seats: a.string().array().required()
-            })
-        }),
         TravelBasic: a.customType({
             outbound: a.customType({
                 location: a.string(),
@@ -85,15 +67,30 @@ const schema = a.schema({
             name: a.string(),
             description: a.string()
         }),
+        Flight: a.customType({
+            outbound: a.customType({
+                airport: a.string(),
+                number: a.string(),
+                startTime: a.string(),
+                endTime: a.string(),
+                seats: a.string().array()
+            }),
+            inbound: a.customType({
+                airport: a.string(),
+                number: a.string(),
+                startTime: a.string(),
+                endTime: a.string(),
+                seats: a.string().array()
+            })
+
+        })
     })
         .identifier(['PK', 'SK'])
         .authorization(allow => [allow.publicApiKey()]),
 });
 
-// Used for code completion / highlighting when making requests from frontend
 export type Schema = ClientSchema<typeof schema>;
 
-// defines the data resource to be deployed
 export const data = defineData({
     schema,
     name: 'hitottabi-api',

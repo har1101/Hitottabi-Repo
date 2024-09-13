@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 import { ChatViewArea } from "../ChatViewArea.tsx";
 import { ChatInputArea } from "../ChatInputArea.tsx";
@@ -182,6 +182,22 @@ export function MainContent(): React.JSX.Element {
                 name: plan.hotel.name,
                 description: plan.hotel.description
             } : {},
+            Flight: plan.flight ? {
+                outbound: {
+                    airport: plan.flight.outbound.airport,
+                    number: plan.flight.outbound.number,
+                    startTime: plan.flight.outbound.startTime,
+                    endTime: plan.flight.outbound.endTime,
+                    seats: plan.flight.outbound.seats.map(seat => JSON.stringify(seat))
+                },
+                inbound: {
+                    airport: plan.flight.inbound.airport,
+                    number: plan.flight.inbound.number,
+                    startTime: plan.flight.inbound.startTime,
+                    endTime: plan.flight.inbound.endTime,
+                    seats: plan.flight.inbound.seats.map(seat => JSON.stringify(seat))
+                },
+            } : {}
         };
 
 
@@ -215,7 +231,7 @@ export function MainContent(): React.JSX.Element {
         setInputAreaStyle(inputAreaStyles.active)
         setIsInputAreaDisabled(false)
 
-        planCreationStatus.hotel = AgentStatus.COMPLETED
+        planCreationStatus.activity = AgentStatus.COMPLETED
         planCreationStatus.inProgressAgent = Agent.HOTEL
 
         await sendMessage('旅行がしたい', false)
@@ -226,9 +242,28 @@ export function MainContent(): React.JSX.Element {
         setIsInputAreaDisabled(false)
 
         planCreationStatus.flight = AgentStatus.COMPLETED
-        // planCreationStatus.inProgressAgent = Agent.HOTEL
 
-        // await sendMessage('旅行がしたい', false)
+        if (planCreationStatus.hotel == AgentStatus.COMPLETED &&
+            planCreationStatus.activity == AgentStatus.COMPLETED &&
+            planCreationStatus.flight == AgentStatus.COMPLETED
+        ) {
+
+            const element = (
+                <Box>
+                    <Box mb={2}>続いて個人情報の入力をお願いします。</Box>
+                    <Button variant="contained" color="primary" sx={{mx: 1}}>
+                        ユーザー情報を入力する
+                    </Button>
+                </Box>
+            )
+
+            const aiMessage: Message = {
+                id: uuid(),
+                sender: 'ai',
+                element: element,
+            };
+            render(aiMessage)
+        }
     }
 
     /**
