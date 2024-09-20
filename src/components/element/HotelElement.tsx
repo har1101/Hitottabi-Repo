@@ -44,34 +44,36 @@ export function HotelElement({plan, hotels, registerPlanToDB, onHotelRegistered}
     return (
         <FormControl component="fieldset">
             <FormLabel id="radio-group-hotels">
-                あなたにおすすめのホテルはこちらです。
+            要望に合ったホテルを選んだよ。
             </FormLabel>
             <RadioGroup
                 aria-labelledby="radio-group-hotels"
                 name="hotels"
                 value={selectedHotel?.name || ""}
                 onChange={onChange}
+                sx={{ display: "flex", flexDirection: "row" }} // 横並びに設定
             >
                 {hotels.map((hotel) => (
                     <FormControlLabel
                         key={hotel.name}
                         value={hotel.name}
-                        control={<Radio/>}
+                        control={<Radio />}
                         label={
-                            <Box mt={2}>
+                            <Box ml={2} display="flex" flexDirection="row"> {/* 横並び設定 */}
                                 <Box>{hotel.name}</Box>
-                                <Box>{hotel.description}</Box>
+                                <Box ml={2}>{hotel.description}</Box> {/* 少し間隔を開ける */}
                             </Box>
                         }
+                        sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mr: 3 }} // 
                     />
                 ))}
             </RadioGroup>
-            <Box mt={2}>
+            <Box mt={2} display="flex" justifyContent="center">
                 <Button variant="contained" color="primary" sx={{mx: 1}} onClick={registerHotel}>
                     OK
                 </Button>
                 <Button variant="contained" color="secondary" sx={{mx: 1}}>
-                    価格を下げたい
+                    詳細はこちら
                 </Button>
             </Box>
         </FormControl>
