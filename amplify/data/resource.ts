@@ -83,6 +83,35 @@ const schema = a.schema({
                 seats: a.string().array()
             })
 
+        }),
+        User: a.customType({
+            Delegate: a.customType({
+                firstname: a.string(),
+                lastname: a.string(),
+                age: a.integer(),
+                gender: a.string(),
+                telno: a.string(),
+                email: a.string(),
+                address: a.string(),
+            }),
+            Traveler1: a.customType({
+                firstname: a.string(),
+                lastname: a.string(),
+                age: a.integer(),
+                gender: a.string(),
+            }),
+            Traveler2: a.customType({
+                firstname: a.string(),
+                lastname: a.string(),
+                age: a.integer(),
+                gender: a.string(),
+            }),
+            Traveler3: a.customType({
+                firstname: a.string(),
+                lastname: a.string(),
+                age: a.integer(),
+                gender: a.string(),
+            })
         })
     })
         .identifier(['PK', 'SK'])
