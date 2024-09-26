@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import { Header } from './components/section/Header.tsx';
 import { MainContent } from './components/section/MainContent.tsx';
 
+
 const theme = createTheme({
     palette: {
         primary: {
@@ -15,6 +16,15 @@ const theme = createTheme({
         },
         background: {
             default: '#E3F2FD', // 薄い青（雲や空をイメージ）
+        },
+    },
+    breakpoints: {
+        values: {
+            xs: 0,   // Extra small devices (phones)
+            sm: 600, // Small devices (tablets)
+            md: 900, // Medium devices (small laptops)
+            lg: 1200,// Large devices (desktops)
+            xl: 1536 // Extra large devices (large desktops)
         },
     },
 });
