@@ -12,7 +12,7 @@ import type { Schema } from "../../../amplify/data/resource.ts";
 import { Message } from "../ChatMessage.tsx";
 import { Flight, FlightElement } from '../element/FlightElement.tsx';
 import { Activity, ActivityElement } from "../element/ActivityElement.tsx";
-
+import { ChatIntroMessage } from "../ChatIntroMessage.tsx";
 
 const client = generateClient<Schema>();
 
@@ -119,7 +119,27 @@ export function MainContent(): React.JSX.Element {
         const sessionId = sessionStorage.getItem('sessionId');
         if (!sessionId) {
             sessionStorage.setItem('sessionId', uuid());
+
+            const createIntro = () => {
+                const aiMessage: Message = {
+                    id: uuid(),
+                    sender: 'ai',
+                    element: <ChatIntroMessage />, // intro関数を呼び出してJSX要素を取得
+                };
+                render(aiMessage);
+            };
+
+            createIntro();
+
         }
+
+        const handleBeforeUnload = () => {
+            sessionStorage.removeItem("sessionId");
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
     }, [])
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -399,6 +419,9 @@ export function MainContent(): React.JSX.Element {
             setIsSending(false);
         }
     }
+
+
+
 
     return (
         <Box component="main" sx={{
