@@ -9,7 +9,7 @@ import { convertNonNullableValue, isJsonParsable, Nullable } from "../../common.
 import { v4 as uuid } from "uuid";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
-import { Message } from "../ChatMessage.tsx"
+import { Message } from "../ChatMessage.tsx";
 import { Flight, FlightElement } from '../element/FlightElement.tsx';
 import { Activity, ActivityElement } from "../element/ActivityElement.tsx";
 import { ChatIntroMessage } from "../ChatIntroMessage.tsx";
