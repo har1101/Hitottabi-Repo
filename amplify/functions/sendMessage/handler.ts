@@ -1,4 +1,4 @@
-import type { Schema } from "../../data/resource"
+/*import type { Schema } from "../../data/resource"
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import outputs from "../../../amplify_outputs.json"
 
@@ -22,3 +22,4 @@ export const handler: Schema["sendMessage"]["functionHandler"] = async (event) =
         return `メッセージの送信に失敗しました! MessageId: ${error.message}`
     }
 };
+*/

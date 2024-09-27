@@ -1,4 +1,4 @@
-import { defineFunction } from '@aws-amplify/backend';
+/*import { defineFunction } from '@aws-amplify/backend';
 
 export const receiveMessage = defineFunction({
     name: 'receiveMessage',
@@ -6,3 +6,4 @@ export const receiveMessage = defineFunction({
     runtime: 20,
     timeoutSeconds: 60
 });
+*/

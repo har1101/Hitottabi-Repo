@@ -1,4 +1,4 @@
-import { SQSEvent, Context, Callback } from 'aws-lambda';
+/*import { SQSEvent, Context, Callback } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import outputs from "../../../amplify_outputs.json"
 
@@ -51,3 +51,4 @@ export const handler = async (event: SQSEvent, context: Context, callback: Callb
         }
     }
 };
+*/
