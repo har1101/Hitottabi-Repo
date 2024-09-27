@@ -5,8 +5,8 @@ import outputs from "../../../amplify_outputs.json"
 export const handler: Schema["sendMessage"]["functionHandler"] = async (event) => {
     const messageBody = event.arguments.inputText
     const sqsClient = new SQSClient({ region: 'ap-northeast-1' });
-    /*const QUEUE_URL = outputs.custom.queue.queueUrl
-    const params = {
+    const QUEUE_URL = "https://sqs.ap-northeast-1.amazonaws.com/026090531931/amplify-gen2app-node-sandbox-9f7f159acf-MyCustomRes-MyQueueE6CA6235-Cxmrjtriras9"
+    /*const params = {
         QueueUrl: QUEUE_URL,
         MessageBody: messageBody,
     };
