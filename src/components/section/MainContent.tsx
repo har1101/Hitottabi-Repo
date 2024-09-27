@@ -370,6 +370,7 @@ export function MainContent(): React.JSX.Element {
             };
             render(aiMessage)
         }
+        await reservationRequest()
     }
 
     /**
