@@ -7,10 +7,10 @@ import { recommendationActivities } from "./functions/recommendationActivities/r
 import { recommendationHotels } from "./functions/recommendationHotels/resource";
 import { recommendationFlight } from "./functions/recommendationFlight/resource";
 import { confirmUserInfo } from "./functions/confirmUserInfo/resource";
-import { sendMessage } from './functions/sendMessage/resource';
-import { receiveMessage } from './functions/receiveMessage/resource';
+//import { sendMessage } from './functions/sendMessage/resource';
+//import { receiveMessage } from './functions/receiveMessage/resource';
 import { data } from "./data/resource"
-import * as eventSources from 'aws-cdk-lib/aws-lambda-event-sources';
+//import * as eventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 
 
 const backend = defineBackend({
@@ -19,8 +19,8 @@ const backend = defineBackend({
     recommendationHotels: recommendationHotels,
     recommendationsFlight: recommendationFlight,
     confirmUserInfo: confirmUserInfo,
-    sendMessage: sendMessage,
-    receiveMessage: receiveMessage
+    //sendMessage: sendMessage,
+    //receiveMessage: receiveMessage
 });
 
 const lambdas = [
@@ -29,10 +29,10 @@ const lambdas = [
     backend.recommendationsFlight.resources.lambda,
     backend.confirmUserInfo.resources.lambda
 ]
-
+/*
 const sendLambda = backend.sendMessage.resources.lambda
 const receiveLambda = backend.receiveMessage.resources.lambda
-
+*/
 const customResourceStack = backend.createStack('MyCustomResources');
 // SQS Queueの作成
 const queue = new sqs.Queue(customResourceStack, 'MyQueue', {
@@ -42,7 +42,7 @@ const queue = new sqs.Queue(customResourceStack, 'MyQueue', {
 const topic = new sns.Topic(customResourceStack, 'MyTopic', {
     displayName: 'Customer notification topic',
 });
-
+/*
 receiveLambda.addEventSource(new eventSources.SqsEventSource(queue))
 sendLambda.addToRolePolicy(
     new iam.PolicyStatement({
@@ -53,14 +53,14 @@ sendLambda.addToRolePolicy(
         resources: ["arn:aws:sqs:ap-northeast-1:026090531931:*"],
     })
 )
-
+*/
 backend.addOutput({
     custom:{
         queue:{queueUrl: queue.queueUrl},
         sns: {topicArn: topic.topicArn}
     }
 })
-
+/*
 receiveLambda.addToRolePolicy(
     new iam.PolicyStatement({
         sid: "AllowPublishToMyTopic",
@@ -72,7 +72,7 @@ receiveLambda.addToRolePolicy(
         resources: ["arn:aws:sns:ap-northeast-1:026090531931:*"],
     })
 )
-
+*/
 const statement = new iam.PolicyStatement({
     sid: "AllowAgentForBedrockInvoke",
     actions: [
