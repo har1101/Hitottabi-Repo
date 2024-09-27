@@ -408,7 +408,7 @@ export function MainContent(): React.JSX.Element {
                 }
 
                 if (planCreationStatus.inProgressAgent == Agent.NONE) {
-                    planCreationStatus.inProgressAgent = Agent.HOTEL;
+                    planCreationStatus.inProgressAgent = Agent.ACTIVITY;
                 }
 
                 if (planCreationStatus.inProgressAgent == Agent.HOTEL) {

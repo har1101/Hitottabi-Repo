@@ -26,9 +26,6 @@ export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered
 
     const handleHotelClick = (hotel: Hotel) => {
         setSelectedHotel(hotel);
-        plan.hotel = hotel;
-        registerPlanToDB(plan);
-        onHotelRegistered(plan);
     };
 
     /**

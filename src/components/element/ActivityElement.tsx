@@ -42,9 +42,6 @@ export function ActivityElement({ plan, activities, travelBasic, registerPlanToD
 
     const handleActivityClick = (activity: Activity) => {
         setSelectedActivity(activity);
-        plan.activity = activity;
-        registerPlanToDB(plan);
-        onActivityRegistered(plan);
     };
 
     /**
