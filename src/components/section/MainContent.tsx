@@ -59,8 +59,8 @@ interface TravelBasic {
 
 
 interface AgentRequest {
-    sessionId: string,
-    inputText: string,
+   sessionId: string,
+   inputText: string,
 }
 
 
@@ -69,7 +69,6 @@ interface AgentResponse {
     activities: Activity[] | null
     hotels: Hotel[] | null
     flight: Flight | null
-    // user: User | null
 }
 
 interface PlanCreationStatus {
@@ -409,7 +408,7 @@ export function MainContent(): React.JSX.Element {
                 }
 
                 if (planCreationStatus.inProgressAgent == Agent.NONE) {
-                    planCreationStatus.inProgressAgent = Agent.ACTIVITY;
+                    planCreationStatus.inProgressAgent = Agent.HOTEL;
                 }
 
                 if (planCreationStatus.inProgressAgent == Agent.HOTEL) {
@@ -438,11 +437,9 @@ export function MainContent(): React.JSX.Element {
      * @param response
      */
     const renderAIMessage = (response: Nullable<string> | undefined) => {
-
-        const convertedResponse: string = convertNonNullableValue(response)
-
+        const convertedResponse: string = convertNonNullableValue(response);
         let element: React.JSX.Element;
-
+    
         if (isJsonParsable(convertedResponse)) {
             const parsedResponse: AgentResponse = JSON.parse(convertedResponse)
 
@@ -453,10 +450,22 @@ export function MainContent(): React.JSX.Element {
             if (planCreationStatus.inProgressAgent == Agent.HOTEL && parsedResponse.hotels) {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
-                element = <HotelElement plan={plan}
-                                        hotels={parsedResponse.hotels}
-                                        registerPlanToDB={registerPlanToDB}
-                                        onHotelRegistered={onHotelRegistered}/>
+                element = (
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        padding: 2,
+                        flexWrap: 'wrap',
+                        gap: 2,
+                    }}>
+                        <HotelElement
+                            plan={plan}
+                            hotels={parsedResponse.hotels}
+                            registerPlanToDB={registerPlanToDB}
+                            onHotelRegistered={onHotelRegistered}
+                        />
+                    </Box>
+                );
 
             } else if (planCreationStatus.inProgressAgent == Agent.ACTIVITY && parsedResponse.activities) {
                 setInputAreaStyle(inputAreaStyles.inactive)
@@ -476,19 +485,20 @@ export function MainContent(): React.JSX.Element {
                                          registerPlanToDB={registerPlanToDB}
                                          onFlightRegistered={onFlightRegistered}/>
             } else {
-                element = <>{convertedResponse}</>
+                element = <>{convertedResponse}</>;  // JSONそのものが表示されている箇所
             }
         } else {
-            element = <>{convertedResponse}</>
+            element = <>{convertedResponse}</>;  // JSON形式でないものが表示される場合
         }
-
+    
         const aiMessage: Message = {
             id: uuid(),
             sender: 'ai',
             element: element,
         };
-        render(aiMessage)
-    }
+    
+        render(aiMessage);  // レンダリング
+    };
 
     /**
      * ユーザーの入力をエージェントに送信する
@@ -499,12 +509,12 @@ export function MainContent(): React.JSX.Element {
         renderUserMessage(input, isRender);
 
         try {
-            const response: Nullable<string> | undefined = await executeAgent(input)
-            renderAIMessage(response)
+            const response: Nullable<string> | undefined = await executeAgent(input);
+            renderAIMessage(response);
         } finally {
             setIsSending(false);
         }
-    }
+    };
 
     /**
      * 予約申し込み
@@ -545,5 +555,3 @@ export function MainContent(): React.JSX.Element {
         </Box>
     );
 }
-
-
