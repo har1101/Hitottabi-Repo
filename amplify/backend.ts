@@ -28,7 +28,7 @@ const lambdas = [
     backend.recommendationActivities.resources.lambda,
     backend.recommendationHotels.resources.lambda,
     backend.recommendationsFlight.resources.lambda,
-    backend.confirmUserInfo.resources.lambda,
+    backend.confirmUserInfo.resources.lambda
 ]
 
 const sendLambda = backend.sendMessage.resources.lambda

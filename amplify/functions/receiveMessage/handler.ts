@@ -38,10 +38,6 @@ export const handler = async (event: SQSEvent, context: Context, callback: Callb
                 Subject: '予約申込が完了しました',
                 TopicArn: snsTopicArn,  // SNSトピックにメッセージを送信
                 MessageAttributes: {
-                    // 'AWS.SNS.SMS.SMSType': {
-                    //     DataType: 'String',
-                    //     StringValue: 'Transactional',
-                    // },
                     'targetEmail': {
                         DataType: 'String',
                         StringValue: emailAddress,

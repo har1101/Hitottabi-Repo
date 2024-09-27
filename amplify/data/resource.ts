@@ -1,7 +1,7 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
-import { recommendationActivities } from "../functions/recommendationActivities/resource.ts";
 import { recommendationHotels } from "../functions/recommendationHotels/resource"
-import { recommendationFlight } from "../functions/recommendationFlight/resource"
+import { recommendationActivities } from "../functions/recommendationActivities/resource.ts";
+import { recommendationFlight } from "../functions/recommendationFlight/resource.ts";
 import { confirmUserInfo } from "../functions/confirmUserInfo/resource.ts";
 import { sendMessage } from "../functions/sendMessage/resource.ts"
 
@@ -13,7 +13,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(recommendationActivities))
         .authorization(allow => [allow.publicApiKey()]),
     recommendationHotels: a
@@ -23,7 +22,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(recommendationHotels))
         .authorization(allow => [allow.publicApiKey()]),
     recommendationsFlight: a
@@ -33,7 +31,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(recommendationFlight))
         .authorization(allow => [allow.publicApiKey()]),
     confirmUserInfo: a
@@ -43,7 +40,6 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
-        // .returns(a.model({message: a.string()}))
         .handler(a.handler.function(confirmUserInfo))
         .authorization(allow => [allow.publicApiKey()]),
     sendMessage: a
@@ -59,24 +55,6 @@ const schema = a.schema({
     Plan: a.model({
         PK: a.id().required(),
         SK: a.string().required(),
-        Flight: a.customType({
-            departure: a.customType({
-                flight_number: a.string().required(),
-                departure_airport: a.string().required(),
-                departure_time: a.string().required(),
-                arrival_time: a.string().required(),
-                price: a.string().required(),
-                seats: a.string().array().required()
-            }),
-            return: a.customType({
-                flight_number: a.string().required(),
-                departure_airport: a.string().required(),
-                departure_time: a.string().required(),
-                arrival_time: a.string().required(),
-                price: a.string().required(),
-                seats: a.string().array().required()
-            })
-        }),
         TravelBasic: a.customType({
             outbound: a.customType({
                 location: a.string(),
@@ -100,20 +78,35 @@ const schema = a.schema({
             name: a.string(),
             description: a.string()
         }),
+        Flight: a.customType({
+            outbound: a.customType({
+                airport: a.string(),
+                number: a.string(),
+                startTime: a.string(),
+                endTime: a.string(),
+                seats: a.string().array()
+            }),
+            inbound: a.customType({
+                airport: a.string(),
+                number: a.string(),
+                startTime: a.string(),
+                endTime: a.string(),
+                seats: a.string().array()
+            })
+
+        })
     })
         .identifier(['PK', 'SK'])
         .authorization(allow => [allow.publicApiKey()]),
 });
 
-// Used for code completion / highlighting when making requests from frontend
 export type Schema = ClientSchema<typeof schema>;
 
-// defines the data resource to be deployed
 export const data = defineData({
     schema,
     name: 'hitottabi-api',
     authorizationModes: {
         defaultAuthorizationMode: 'apiKey',
-        apiKeyAuthorizationMode: { expiresInDays: 30 }
+        apiKeyAuthorizationMode: {expiresInDays: 30}
     }
 });
