@@ -4,7 +4,7 @@ import outputs from "../../../amplify_outputs.json"
 
 const sns = new AWS.SNS();
 
-export const handler = async (event: SQSEvent, context: Context, callback: Callback) => {
+export const handler = async (event: SQSEvent) => {
     const snsTopicArn = outputs.custom.sns.topicArn;
 
     for (const record of event.Records) {
