@@ -10,7 +10,7 @@ export const handler: Schema["sendMessage"]["functionHandler"] = async (event) =
         QueueUrl: QUEUE_URL,
         MessageBody: messageBody,
     };
-
+    /*
     try {
         const data = await sqsClient.send(new SendMessageCommand(params));
         console.log('メッセージが送信されました:', data.MessageId);
@@ -20,5 +20,6 @@ export const handler: Schema["sendMessage"]["functionHandler"] = async (event) =
         console.error('メッセージ送信エラー:', error);
 
         return `メッセージの送信に失敗しました! MessageId: ${error.message}`
-    }
+    }*/
+   return "test"
 };
