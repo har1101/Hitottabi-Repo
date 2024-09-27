@@ -10,7 +10,6 @@ import { confirmUserInfo } from "./functions/confirmUserInfo/resource";
 import { sendMessage } from './functions/sendMessage/resource';
 import { receiveMessage } from './functions/receiveMessage/resource';
 import { data } from "./data/resource"
-import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as eventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 
 
