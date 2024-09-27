@@ -1,9 +1,9 @@
-/*import type { Schema } from "../../data/resource"
+import type { Schema } from "../../data/resource"
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import outputs from "../../../amplify_outputs.json"
 
 export const handler: Schema["sendMessage"]["functionHandler"] = async (event) => {
-    const messageBody = event.arguments.inputText
+    /*const messageBody = event.arguments.inputText
     const sqsClient = new SQSClient({ region: 'ap-northeast-1' });
     const QUEUE_URL = outputs.custom.queue.queueUrl
     const params = {
@@ -20,6 +20,6 @@ export const handler: Schema["sendMessage"]["functionHandler"] = async (event) =
         console.error('メッセージ送信エラー:', error);
 
         return `メッセージの送信に失敗しました! MessageId: ${error.message}`
-    }
+    }*/
+   return "test"
 };
-*/

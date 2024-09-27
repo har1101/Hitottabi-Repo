@@ -3,7 +3,7 @@ import { recommendationHotels } from "../functions/recommendationHotels/resource
 import { recommendationActivities } from "../functions/recommendationActivities/resource.ts";
 import { recommendationFlight } from "../functions/recommendationFlight/resource.ts";
 import { confirmUserInfo } from "../functions/confirmUserInfo/resource.ts";
-//import { sendMessage } from "../functions/sendMessage/resource.ts"
+import { sendMessage } from "../functions/sendMessage/resource.ts"
 
 
 const schema = a.schema({
@@ -43,7 +43,7 @@ const schema = a.schema({
         .returns(a.string())
         .handler(a.handler.function(confirmUserInfo))
         .authorization(allow => [allow.publicApiKey()]),
-    /*sendMessage: a
+    sendMessage: a
         .query()
         .arguments({
             sessionId: a.string().required(),
@@ -51,7 +51,7 @@ const schema = a.schema({
         })
         .returns(a.string())
         .handler(a.handler.function(sendMessage))
-        .authorization(allow => [allow.publicApiKey()]),*/
+        .authorization(allow => [allow.publicApiKey()]),
     Plan: a.model({
         PK: a.id().required(),
         SK: a.string().required(),
