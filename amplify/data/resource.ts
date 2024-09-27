@@ -3,7 +3,10 @@ import { recommendationHotels } from "../functions/recommendationHotels/resource
 import { recommendationActivities } from "../functions/recommendationActivities/resource.ts";
 import { recommendationFlight } from "../functions/recommendationFlight/resource.ts";
 import { confirmUserInfo } from "../functions/confirmUserInfo/resource.ts";
+<<<<<<< HEAD
 import { sendMessage } from "../functions/sendMessage/resource.ts"
+=======
+>>>>>>> 500f47038c753fea1c2b34530d0fba38859e10ae
 
 const schema = a.schema({
     recommendationActivities: a
@@ -13,6 +16,10 @@ const schema = a.schema({
             inputText: a.string().required(),
         })
         .returns(a.string())
+<<<<<<< HEAD
+=======
+        // .returns(a.model({message: a.string()}))
+>>>>>>> 500f47038c753fea1c2b34530d0fba38859e10ae
         .handler(a.handler.function(recommendationActivities))
         .authorization(allow => [allow.publicApiKey()]),
     recommendationHotels: a
@@ -50,11 +57,16 @@ const schema = a.schema({
         })
         .returns(a.string())
         // .returns(a.model({message: a.string()}))
+<<<<<<< HEAD
         .handler(a.handler.function(sendMessage))
+=======
+        .handler(a.handler.function(confirmUserInfo))
+>>>>>>> 500f47038c753fea1c2b34530d0fba38859e10ae
         .authorization(allow => [allow.publicApiKey()]),
     Plan: a.model({
         PK: a.id().required(),
         SK: a.string().required(),
+<<<<<<< HEAD
         TravelBasic: a.customType({
             outbound: a.customType({
                 location: a.string(),
@@ -78,6 +90,8 @@ const schema = a.schema({
             name: a.string(),
             description: a.string()
         }),
+=======
+>>>>>>> 500f47038c753fea1c2b34530d0fba38859e10ae
         Flight: a.customType({
             outbound: a.customType({
                 airport: a.string(),
@@ -93,8 +107,35 @@ const schema = a.schema({
                 endTime: a.string(),
                 seats: a.string().array()
             })
+<<<<<<< HEAD
 
         })
+=======
+        }),
+        TravelBasic: a.customType({
+            outbound: a.customType({
+                location: a.string(),
+                date: a.string()
+            }),
+            inbound: a.customType({
+                location: a.string(),
+                date: a.string()
+            }),
+            people: a.customType({
+                adults: a.integer(),
+                children: a.integer(),
+                infants: a.integer(),
+            })
+        }),
+        Hotel: a.customType({
+            name: a.string(),
+            description: a.string()
+        }),
+        Activity: a.customType({
+            name: a.string(),
+            description: a.string()
+        }),
+>>>>>>> 500f47038c753fea1c2b34530d0fba38859e10ae
     })
         .identifier(['PK', 'SK'])
         .authorization(allow => [allow.publicApiKey()]),
