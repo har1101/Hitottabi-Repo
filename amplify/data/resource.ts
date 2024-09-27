@@ -3,6 +3,8 @@ import { recommendationHotels } from "../functions/recommendationHotels/resource
 import { recommendationActivities } from "../functions/recommendationActivities/resource.ts";
 import { recommendationFlight } from "../functions/recommendationFlight/resource.ts";
 import { confirmUserInfo } from "../functions/confirmUserInfo/resource.ts";
+import { sendMessage } from "../functions/sendMessage/resource.ts"
+
 
 const schema = a.schema({
     recommendationActivities: a
@@ -40,6 +42,15 @@ const schema = a.schema({
         })
         .returns(a.string())
         .handler(a.handler.function(confirmUserInfo))
+        .authorization(allow => [allow.publicApiKey()]),
+    sendMessage: a
+        .query()
+        .arguments({
+            sessionId: a.string().required(),
+            inputText: a.string().required(),
+        })
+        .returns(a.string())
+        .handler(a.handler.function(sendMessage))
         .authorization(allow => [allow.publicApiKey()]),
     Plan: a.model({
         PK: a.id().required(),
@@ -82,7 +93,6 @@ const schema = a.schema({
                 endTime: a.string(),
                 seats: a.string().array()
             })
-
         }),
         User: a.customType({
             Delegate: a.customType({

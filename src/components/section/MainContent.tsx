@@ -9,12 +9,12 @@ import { convertNonNullableValue, isJsonParsable, Nullable } from "../../common.
 import { v4 as uuid } from "uuid";
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
-import { Message } from "../ChatMessage.tsx";
+import { Message } from "../ChatMessage.tsx"
 import { Flight, FlightElement } from '../element/FlightElement.tsx';
 import { Activity, ActivityElement } from "../element/ActivityElement.tsx";
 import { ChatIntroMessage } from "../ChatIntroMessage.tsx";
+import { Reservation } from '../element/Reservation.tsx';
 import { User, UserInfoModal } from "../element/UserElement.tsx";
-
 
 const client = generateClient<Schema>();
 
@@ -126,7 +126,7 @@ export function MainContent(): React.JSX.Element {
                 const aiMessage: Message = {
                     id: uuid(),
                     sender: 'ai',
-                    element: <ChatIntroMessage />, // intro関数を呼び出してJSX要素を取得
+                    element: <ChatIntroMessage/>, // intro関数を呼び出してJSX要素を取得
                 };
                 render(aiMessage);
             };
@@ -177,7 +177,7 @@ export function MainContent(): React.JSX.Element {
     const modalClose = () => {
         setIsModalOpen(false);
     };
-    
+
 
     /**
      * プランをDBへ登録
@@ -299,6 +299,20 @@ export function MainContent(): React.JSX.Element {
         await sendMessage('旅行がしたい', false)
     }
 
+
+    const onReservationRequested = async () => {
+        const element = (
+            <Box mb={1}>予約申込が完了しました。</Box>
+        )
+
+        const aiMessage: Message = {
+            id: uuid(),
+            sender: 'ai',
+            element: element,
+        };
+        render(aiMessage)
+    }
+
     /**
      * 飛行機登録完了後、ユーザー情報を入力する
      */
@@ -307,7 +321,6 @@ export function MainContent(): React.JSX.Element {
         setIsInputAreaDisabled(false)
 
         planCreationStatus.flight = AgentStatus.COMPLETED
-
         if (planCreationStatus.hotel == AgentStatus.COMPLETED &&
             planCreationStatus.activity == AgentStatus.COMPLETED &&
             planCreationStatus.flight == AgentStatus.COMPLETED
@@ -357,6 +370,7 @@ export function MainContent(): React.JSX.Element {
             };
             render(aiMessage)
         }
+        await reservationRequest()
     }
 
     /**
@@ -461,7 +475,6 @@ export function MainContent(): React.JSX.Element {
                                          flight={parsedResponse.flight}
                                          registerPlanToDB={registerPlanToDB}
                                          onFlightRegistered={onFlightRegistered}/>
-
             } else {
                 element = <>{convertedResponse}</>
             }
@@ -493,8 +506,19 @@ export function MainContent(): React.JSX.Element {
         }
     }
 
-
-
+    /**
+     * 予約申し込み
+     */
+    const reservationRequest = async () => {
+        const element = <Reservation plan={plan} onReservationRequested={onReservationRequested}></Reservation>
+        const aiMessage: Message = {
+            id: uuid(),
+            sender: 'ai',
+            element: element,
+        };
+        render(aiMessage)
+        return;
+    }
 
     return (
         <Box component="main" sx={{
@@ -521,3 +545,5 @@ export function MainContent(): React.JSX.Element {
         </Box>
     );
 }
+
+
