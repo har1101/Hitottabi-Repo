@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 
@@ -15,6 +14,7 @@ import { Flight, FlightElement } from '../element/FlightElement.tsx';
 import { Activity, ActivityElement } from "../element/ActivityElement.tsx";
 import { ChatIntroMessage } from "../ChatIntroMessage.tsx";
 import { Reservation } from '../element/Reservation.tsx';
+import { User, UserInfoModal } from "../element/UserElement.tsx";
 
 const client = generateClient<Schema>();
 
@@ -38,7 +38,7 @@ export interface Plan {
     activity: Activity | null
     hotel: Hotel | null
     flight: Flight | null
-    // user: User | null
+    user: User[] | null
 }
 
 interface TravelBasic {
@@ -105,7 +105,7 @@ const plan: Plan = {
     activity: null,
     hotel: null,
     flight: null,
-    // user: null
+    user: null
 }
 
 const planCreationStatus: PlanCreationStatus = {
@@ -126,7 +126,7 @@ export function MainContent(): React.JSX.Element {
                 const aiMessage: Message = {
                     id: uuid(),
                     sender: 'ai',
-                    element: <ChatIntroMessage />, // intro関数を呼び出してJSX要素を取得
+                    element: <ChatIntroMessage/>, // intro関数を呼び出してJSX要素を取得
                 };
                 render(aiMessage);
             };
@@ -150,6 +150,7 @@ export function MainContent(): React.JSX.Element {
     const [isSending, setIsSending] = useState(false);
     const [inputAreaStyle, setInputAreaStyle] = useState(inputAreaStyles.active)
     const [isInputAreaDisabled, setIsInputAreaDisabled] = useState(false)
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
 
     useEffect(() => {
         if (isRenderUserMessage) {
@@ -165,6 +166,17 @@ export function MainContent(): React.JSX.Element {
     const render = (aiMessage: Message) => {
         setMessages((prev) => [...prev, aiMessage]);
     }
+
+    /**
+     * ユーザー情報を入力するためのモーダル状態管理
+     */
+    const modalOpen = () => {
+        setIsModalOpen(true);
+    };
+
+    const modalClose = () => {
+        setIsModalOpen(false);
+    };
 
 
     /**
@@ -219,11 +231,39 @@ export function MainContent(): React.JSX.Element {
                     endTime: plan.flight.inbound.endTime,
                     seats: plan.flight.inbound.seats.map(seat => JSON.stringify(seat))
                 },
-            } : {}
-        };
+            } : {},
+            User: plan.user && plan.user.length > 0 ? {
+                Delegate: plan.user[0] ? {
+                    firstname: plan.user[0].firstname || null,
+                    lastname: plan.user[0].lastname || null,
+                    age: plan.user[0].age ? Number(plan.user[0].age) : null,
+                    gender: plan.user[0].gender || null,
+                    telno: plan.user[0].telno || null,
+                    email: plan.user[0].email || null,
+                    address: plan.user[0].address || null
+                } : null,
+                Traveler1: plan.user[1] ? {
+                    firstname: plan.user[1].firstname || null,
+                    lastname: plan.user[1].lastname || null,
+                    age: Number(plan.user[1].age) || null,
+                    gender: plan.user[1].gender || null,
+                } : null,
+                Traveler2: plan.user[2] ? {
+                    firstname: plan.user[2].firstname || null,
+                    lastname: plan.user[2].lastname || null,
+                    age: Number(plan.user[2].age) || null,
+                    gender: plan.user[2].gender || null,
+                } : null,
+                Traveler3: plan.user[3] ? {
+                    firstname: plan.user[3].firstname || null,
+                    lastname: plan.user[3].lastname || null,
+                    age: Number(plan.user[3].age) || null,
+                    gender: plan.user[3].gender || null,
+                } : null
+            } : null
+        }
 
-
-        const response = (await client.models.Plan.get({ PK: sessionId, SK: 'test' })).data
+        const response = (await client.models.Plan.get({PK: sessionId, SK: 'test'})).data
 
         if (response) {
             await client.models.Plan.update(planData);
@@ -259,12 +299,28 @@ export function MainContent(): React.JSX.Element {
         await sendMessage('旅行がしたい', false)
     }
 
+
+    const onReservationRequested = async () => {
+        const element = (
+            <Box mb={1}>予約申込が完了しました。</Box>
+        )
+
+        const aiMessage: Message = {
+            id: uuid(),
+            sender: 'ai',
+            element: element,
+        };
+        render(aiMessage)
+    }
+
+    /**
+     * 飛行機登録完了後、ユーザー情報を入力する
+     */
     const onFlightRegistered = async () => {
         setInputAreaStyle(inputAreaStyles.active)
         setIsInputAreaDisabled(false)
 
         planCreationStatus.flight = AgentStatus.COMPLETED
-
         if (planCreationStatus.hotel == AgentStatus.COMPLETED &&
             planCreationStatus.activity == AgentStatus.COMPLETED &&
             planCreationStatus.flight == AgentStatus.COMPLETED
@@ -273,7 +329,7 @@ export function MainContent(): React.JSX.Element {
             const element = (
                 <Box>
                     <Box mb={2}>続いて個人情報の入力をお願いします。</Box>
-                    <Button variant="contained" color="primary" sx={{ mx: 1 }}>
+                    <Button variant="contained" onClick={modalOpen} color="primary" sx={{mx: 1}}>
                         ユーザー情報を入力する
                     </Button>
                 </Box>
@@ -288,17 +344,32 @@ export function MainContent(): React.JSX.Element {
         }
     }
 
-    const onReservationRequested = async () => {
-        const element = (
-            <Box mb={1}>予約申込が完了しました。</Box>
-        )
+    /**
+     * ユーザー情報登録完了後、旅行プランが完成したことを伝える(暫定処理)
+     */
+    const onUserRegistered = async () => {
+        setInputAreaStyle(inputAreaStyles.active)
+        setIsInputAreaDisabled(false)
 
-        const aiMessage: Message = {
-            id: uuid(),
-            sender: 'ai',
-            element: element,
-        };
-        render(aiMessage)
+        planCreationStatus.user = AgentStatus.COMPLETED
+
+        if (planCreationStatus.hotel == AgentStatus.COMPLETED &&
+            planCreationStatus.activity == AgentStatus.COMPLETED &&
+            planCreationStatus.flight == AgentStatus.COMPLETED &&
+            planCreationStatus.user == AgentStatus.COMPLETED
+        ) {
+            const element = (
+                <Box>
+                    <Box mb={2}>旅行計画が完成しました！</Box>
+                </Box>
+            )
+            const aiMessage: Message = {
+                id: uuid(),
+                sender: 'ai',
+                element: element,
+            };
+            render(aiMessage)
+        }
     }
 
     /**
@@ -382,17 +453,17 @@ export function MainContent(): React.JSX.Element {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
                 element = <HotelElement plan={plan}
-                    hotels={parsedResponse.hotels}
-                    registerPlanToDB={registerPlanToDB}
-                    onHotelRegistered={onHotelRegistered} />
+                                        hotels={parsedResponse.hotels}
+                                        registerPlanToDB={registerPlanToDB}
+                                        onHotelRegistered={onHotelRegistered}/>
 
             } else if (planCreationStatus.inProgressAgent == Agent.ACTIVITY && parsedResponse.activities) {
                 setInputAreaStyle(inputAreaStyles.inactive)
                 setIsInputAreaDisabled(true)
                 element = <ActivityElement plan={plan}
-                    activities={parsedResponse.activities}
-                    registerPlanToDB={registerPlanToDB}
-                    onActivityRegistered={onActivityRegistered}>
+                                           activities={parsedResponse.activities}
+                                           registerPlanToDB={registerPlanToDB}
+                                           onActivityRegistered={onActivityRegistered}>
                 </ActivityElement>
 
             } else if (planCreationStatus.inProgressAgent == Agent.FLIGHT && parsedResponse.flight) {
@@ -400,10 +471,9 @@ export function MainContent(): React.JSX.Element {
                 setIsInputAreaDisabled(true)
                 // element = <>{convertedResponse}</>
                 element = <FlightElement plan={plan}
-                    flight={parsedResponse.flight}
-                    registerPlanToDB={registerPlanToDB}
-                    onFlightRegistered={onFlightRegistered} />
-
+                                         flight={parsedResponse.flight}
+                                         registerPlanToDB={registerPlanToDB}
+                                         onFlightRegistered={onFlightRegistered}/>
             } else {
                 element = <>{convertedResponse}</>
             }
@@ -456,7 +526,14 @@ export function MainContent(): React.JSX.Element {
             flexDirection: 'column',
             overflow: 'hidden',
         }}>
-            <ChatViewArea messages={messages} />
+            <ChatViewArea messages={messages}/>
+            <UserInfoModal
+                isOpen={isModalOpen}
+                onClose={modalClose}
+                plan={plan}
+                registerPlanToDB={registerPlanToDB}
+                onUserRegistered={onUserRegistered}
+            />
             <ChatInputArea
                 input={input}
                 setInput={setInput}
