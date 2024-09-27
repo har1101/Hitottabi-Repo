@@ -5,12 +5,12 @@ import outputs from "../../../amplify_outputs.json"
 export const handler: Schema["sendMessage"]["functionHandler"] = async (event) => {
     const messageBody = event.arguments.inputText
     const sqsClient = new SQSClient({ region: 'ap-northeast-1' });
-    const QUEUE_URL = outputs.custom.queue.queueUrl
+    /*const QUEUE_URL = outputs.custom.queue.queueUrl
     const params = {
         QueueUrl: QUEUE_URL,
         MessageBody: messageBody,
     };
-    /*
+    
     try {
         const data = await sqsClient.send(new SendMessageCommand(params));
         console.log('メッセージが送信されました:', data.MessageId);
