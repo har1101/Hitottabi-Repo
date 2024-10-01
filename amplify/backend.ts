@@ -1,7 +1,5 @@
 import { defineBackend } from '@aws-amplify/backend';
-import * as cdk from 'aws-cdk-lib';
 import * as iam from "aws-cdk-lib/aws-iam";
-import * as sns from 'aws-cdk-lib/aws-sns';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { recommendationActivities } from "./functions/recommendationActivities/resource";
 import { recommendationHotels } from "./functions/recommendationHotels/resource";
@@ -34,16 +32,12 @@ const sendLambda = backend.sendMessage.resources.lambda
 const receiveLambda = backend.receiveMessage.resources.lambda
 
 const customResourceStack = backend.createStack('MyCustomResources');
-// SQS Queueの作成
-const queue = new sqs.Queue(customResourceStack, 'MyQueue', {
-    visibilityTimeout: cdk.Duration.seconds(60),
-});
-// SNS Topicの作成
-const topic = new sns.Topic(customResourceStack, 'MyTopic', {
-    displayName: 'Customer notification topic',
-});
+
+// SQS Queueの取得
+const queue = sqs.Queue.fromQueueArn(customResourceStack, 'ExistingQueue', "arn:aws:sqs:ap-northeast-1:026090531931:Temp-Hitottabi")
 
 receiveLambda.addEventSource(new eventSources.SqsEventSource(queue))
+
 sendLambda.addToRolePolicy(
     new iam.PolicyStatement({
         sid: "AllowSQSSendMessage",
@@ -54,22 +48,14 @@ sendLambda.addToRolePolicy(
     })
 )
 
-backend.addOutput({
-    custom:{
-        queue:{queueUrl: queue.queueUrl},
-        sns: {topicArn: topic.topicArn}
-    }
-})
-
 receiveLambda.addToRolePolicy(
     new iam.PolicyStatement({
-        sid: "AllowPublishToMyTopic",
+        sid: "AllowSendEmail",
         actions: [
-            "sns:Publish",
-            "sns:Subscribe",
-            "sns:CreateTopic"
+            "ses:SendEmail",
+            "ses:SendRawEmail"
         ],
-        resources: ["arn:aws:sns:ap-northeast-1:026090531931:*"],
+        resources: ["arn:aws:ses:ap-northeast-1:026090531931:*"],
     })
 )
 
