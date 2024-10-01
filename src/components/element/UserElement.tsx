@@ -40,6 +40,9 @@ const initialUserData: User = {
     lastname: '',
     age: '',
     gender: '',
+    telno: '',
+    email: '',
+    address: '',
 };
 
 export function UserInfoModal({ isOpen, onClose, plan, registerPlanToDB, onUserRegistered }: UserInfoModalProps) {
@@ -64,8 +67,9 @@ export function UserInfoModal({ isOpen, onClose, plan, registerPlanToDB, onUserR
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (users.every(user => 
-            user.firstname && user.lastname && user.gender !== '' && user.age !== '')) {
+        if (users.every((user, index) => 
+            user.firstname && user.lastname && user.gender !== '' && user.age !== '' &&
+            (index === 0 ? user.telno && user.email && user.address : true))) {
             plan.user = users;
 
             registerPlanToDB(plan);
@@ -97,48 +101,86 @@ export function UserInfoModal({ isOpen, onClose, plan, registerPlanToDB, onUserR
                                     {index === 0 ? '代表者' : `同行者 ${index}`}
                                 </Typography>
                                 <Stack spacing={2}>
-                                    <TextField
-                                        label="姓"
-                                        value={user.lastname}
-                                        onChange={(e) => handleChange(index, 'lastname', e.target.value)}
-                                        fullWidth
-                                        required
-                                    />
-                                    <TextField
-                                        label="名"
-                                        value={user.firstname}
-                                        onChange={(e) => handleChange(index, 'firstname', e.target.value)}
-                                        fullWidth
-                                        required
-                                    />
-                                    <FormControl fullWidth required>
-                                        <InputLabel id={`age-select-label-${index}`}>年齢</InputLabel>
-                                        <Select
-                                            labelId={`age-select-label-${index}`}
-                                            value={user.age}
-                                            label="年齢"
-                                            onChange={(e) => handleChange(index, 'age', e.target.value as number)}
-                                        >
-                                            <MenuItem value="" disabled>選択してください</MenuItem>
-                                            {[...Array(101)].map((_, i) => (
-                                                <MenuItem key={i} value={i}>{i}歳</MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl fullWidth required>
-                                        <InputLabel id={`gender-select-label-${index}`}>性別</InputLabel>
-                                        <Select
-                                            labelId={`gender-select-label-${index}`}
-                                            value={user.gender}
-                                            label="性別"
-                                            onChange={(e) => handleChange(index, 'gender', e.target.value as 'male' | 'female' | 'not_specified')}
-                                        >
-                                            <MenuItem value="" disabled>選択してください</MenuItem>
-                                            <MenuItem value="male">男性</MenuItem>
-                                            <MenuItem value="female">女性</MenuItem>
-                                            <MenuItem value="not_specified">無回答</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    <Box display="flex" justifyContent="space-between">
+                                        <Box width="48%">
+                                            <TextField
+                                                label="姓"
+                                                value={user.lastname}
+                                                onChange={(e) => handleChange(index, 'lastname', e.target.value)}
+                                                fullWidth
+                                                required
+                                            />
+                                        </Box>
+                                        <Box width="48%">
+                                            <TextField
+                                                label="名"
+                                                value={user.firstname}
+                                                onChange={(e) => handleChange(index, 'firstname', e.target.value)}
+                                                fullWidth
+                                                required
+                                            />
+                                        </Box>
+                                    </Box>
+                                    <Box display="flex" justifyContent="space-between">
+                                        <Box width="48%">
+                                            <FormControl fullWidth required>
+                                                <InputLabel id={`age-select-label-${index}`}>年齢</InputLabel>
+                                                <Select
+                                                    labelId={`age-select-label-${index}`}
+                                                    value={user.age}
+                                                    label="年齢"
+                                                    onChange={(e) => handleChange(index, 'age', e.target.value as number)}
+                                                >
+                                                    <MenuItem value="" disabled>選択してください</MenuItem>
+                                                    {[...Array(101)].map((_, i) => (
+                                                        <MenuItem key={i} value={i}>{i}歳</MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Box>
+                                        <Box width="48%">
+                                            <FormControl fullWidth required>
+                                                <InputLabel id={`gender-select-label-${index}`}>性別</InputLabel>
+                                                <Select
+                                                    labelId={`gender-select-label-${index}`}
+                                                    value={user.gender}
+                                                    label="性別"
+                                                    onChange={(e) => handleChange(index, 'gender', e.target.value as 'male' | 'female' | 'not_specified')}
+                                                >
+                                                    <MenuItem value="" disabled>選択してください</MenuItem>
+                                                    <MenuItem value="male">男性</MenuItem>
+                                                    <MenuItem value="female">女性</MenuItem>
+                                                    <MenuItem value="not_specified">無回答</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Box>
+                                    </Box>
+                                    {index === 0 && (
+                                        <>
+                                            <TextField
+                                                label="電話番号"
+                                                value={user.telno}
+                                                onChange={(e) => handleChange(index, 'telno', e.target.value)}
+                                                fullWidth
+                                                required
+                                            />
+                                            <TextField
+                                                label="メールアドレス"
+                                                type="email"
+                                                value={user.email}
+                                                onChange={(e) => handleChange(index, 'email', e.target.value)}
+                                                fullWidth
+                                                required
+                                            />
+                                            <TextField
+                                                label="住所"
+                                                value={user.address}
+                                                onChange={(e) => handleChange(index, 'address', e.target.value)}
+                                                fullWidth
+                                                required
+                                            />
+                                        </>
+                                    )}
                                 </Stack>
                             </Box>
                         ))}
