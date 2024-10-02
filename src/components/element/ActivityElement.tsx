@@ -75,9 +75,10 @@ export function ActivityElement({ plan, activities, travelBasic, registerPlanToD
                 要望にあったアクティビティを3つ選んだよ✈
             </Typography>
 
+            {/* xs: 画面が小さいとき（スマホ）には1列、sm: 中程度の画面では2列、lg: PC画面では3列にする */}
             <Grid container spacing={2} justifyContent="center">
                 {activities.map((activity) => (
-                    <Grid item xs={12} sm={4} key={activity.name} sx={{ position: 'relative' }}>
+                    <Grid item xs={12} sm={6} md={4} key={activity.name} sx={{ position: 'relative' }}>
                         <Box
                             borderRadius={2}
                             p={3} // 上部に余白を少し追加して、「～選択～」と重ならないように
