@@ -57,9 +57,10 @@ export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered
                 要望にあったホテルを3つ選んだよ✈
             </Typography>
 
+            {/* xs: スマホでは1列、sm: タブレットでは2列、md: PCでは3列で表示 */}
             <Grid container spacing={2} justifyContent="center">
                 {hotels.map((hotel) => (
-                    <Grid item xs={12} sm={4} key={hotel.name} sx={{ position: 'relative' }}>
+                    <Grid item xs={12} sm={6} md={4} key={hotel.name} sx={{ position: 'relative' }}>
                         <Box
                             borderRadius={2}
                             p={3} // 上部に余白を少し追加して、「～選択～」と重ならないように
