@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, Button, FormControl, Grid, Typography } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Button, FormControl, Typography, Stack } from "@mui/material";
 import { Plan } from "../section/MainContent.tsx";
 
 export interface Hotel {
@@ -18,14 +18,31 @@ interface Props {
     onPriceLowerRequest?: () => void; // オプショナルにする
 }
 
+const useWindowWidth = () => {
+    const [width, setWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    return width;
+};
+
 export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered, onPriceLowerRequest }: Props): React.JSX.Element {
     const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+    const [disable, setDisable] = useState(false)
+    const width = useWindowWidth();
 
     // 背景色を一色で統一（薄めの青色）
     const backgroundColor = "#e0f7fa";
 
     const handleHotelClick = (hotel: Hotel) => {
-        setSelectedHotel(hotel);
+        if (!disable) setSelectedHotel(hotel);
     };
 
     /**
@@ -47,20 +64,20 @@ export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered
 
             console.log("JSON Response:", JSON.stringify(hotelResponse, null, 2)); // 最終的にJSON形式で返す
             registerPlanToDB(plan);
+            setDisable(true)
             onHotelRegistered(plan);
         }
     };
 
     return (
-        <FormControl component="fieldset">
+        <FormControl component="fieldset" sx={{ width: width * 0.5 }}>
             <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
                 要望にあったホテルを3つ選んだよ✈
             </Typography>
 
-            {/* xs: スマホでは1列、sm: タブレットでは2列、md: PCでは3列で表示 */}
-            <Grid container spacing={2} justifyContent="center">
+            <Stack direction="row" spacing={2} sx={{ overflowX: "scroll", width: "auto" }}>
                 {hotels.map((hotel) => (
-                    <Grid item xs={12} sm={6} md={4} key={hotel.name} sx={{ position: 'relative' }}>
+                    <Box key={hotel.name} sx={{ position: 'relative' }}>
                         <Box
                             borderRadius={2}
                             p={3} // 上部に余白を少し追加して、「～選択～」と重ならないように
@@ -73,20 +90,20 @@ export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered
                             color="#000" // テキスト色を黒に
                             position="relative"
                             onClick={() => handleHotelClick(hotel)} // ホテルがクリックされたときのイベント
-                            sx={{ cursor: 'pointer', height: '100%' }} // カード全体をクリック可能にする
+                            sx={{ cursor: 'pointer', height: '100%', width:300 }} // カード全体をクリック可能にする
                         >
-                            <Box 
-                                component="img" 
-                                src={hotel.image} 
-                                alt={hotel.name} 
-                                sx={{ width: "100%", height: "200px", objectFit: "cover", mb: 2 }} 
+                            <Box
+                                component="img"
+                                src={hotel.image}
+                                alt={hotel.name}
+                                sx={{ width: "100%", height: "200px", objectFit: "cover", mb: 2 }}
                             />
                             <Typography variant="h6" align="center" sx={{ minHeight: "3rem" }}>{hotel.name}</Typography>
                             <Typography>{hotel.description}</Typography>
                             <Typography>{hotel.address}</Typography>
                             <Typography>価格: {hotel.price}円</Typography>
 
-                            <Button 
+                            <Button
                                 variant="contained"
                                 sx={{ mt: 2, backgroundColor: 'orange', '&:hover': { backgroundColor: 'darkorange' } }} // 背景色をオレンジに変更し、ホバー時の色を暗いオレンジに
                                 href={hotel.image}
@@ -95,18 +112,18 @@ export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered
                                 詳細はこちら
                             </Button>
                         </Box>
-                    </Grid>
+                    </Box>
                 ))}
-            </Grid>
+            </Stack>
 
             <Box mt={2}>
-                <Button variant="contained" color="primary" sx={{ mx: 1 }} onClick={registerHotel}>
+                <Button variant="contained" color="primary" disabled={disable} sx={{ mx: 1 }} onClick={registerHotel}>
                     こちらのホテルにします✈
                 </Button>
-                <Button variant="contained" color="secondary" sx={{ mx: 1 }} onClick={onPriceLowerRequest}>
+                <Button variant="contained" color="secondary" disabled={disable} sx={{ mx: 1 }} onClick={onPriceLowerRequest}>
                     価格を下げたい
                 </Button>
             </Box>
-        </FormControl>
+        </FormControl >
     );
 }
