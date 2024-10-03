@@ -2,7 +2,7 @@ import { Box, Button, Typography, Table, TableContainer, TableBody, TableRow, Ta
 import { generateClient } from "aws-amplify/api";
 import type { Schema } from "../../../amplify/data/resource.ts";
 import { Plan } from "../section/MainContent.tsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const client = generateClient<Schema>();
 
