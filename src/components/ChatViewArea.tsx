@@ -49,6 +49,7 @@ export function ChatViewArea({messages}: Messages) {
                 gap: 2,
                 padding: 2,
                 backgroundColor: 'background.default',
+                whiteSpace: "pre-wrap"
             }}
         >
             {/* メッセージを逆順に表示 */}

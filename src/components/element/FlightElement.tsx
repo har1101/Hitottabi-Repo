@@ -32,17 +32,14 @@ interface Props {
 }
 
 export function FlightElement({ plan, flight, registerPlanToDB, onFlightRegistered }: Props): React.JSX.Element {
-    const [selectedFlight, setSelectedFlight] = useState<'outbound' | 'inbound' | null>(null);
+    const [disable, setDisable] = useState(false)
 
     // フライト登録を行う関数を定義
     const registerFlight = () => {
         plan.flight = flight; // 現在のフライト情報をプランに設定
         registerPlanToDB(plan); // プランをデータベースに登録
+        setDisable(true)
         onFlightRegistered(plan); // 登録完了後の処理を呼び出し
-    };
-
-    const handleFlightClick = (flightType: 'outbound' | 'inbound') => {
-        setSelectedFlight(flightType);
     };
 
     const backgroundColor = "#e0f7fa";  // 背景色を統一
@@ -65,18 +62,17 @@ export function FlightElement({ plan, flight, registerPlanToDB, onFlightRegister
 
             <Grid container spacing={2} justifyContent="center">
                 {/* 往路 */}
-                <Grid item xs={12} sm={5} sx={{ position: 'relative' }}>
+                <Grid item xs={12} sm={6} sx={{ position: 'relative' }}>
                     <Box
                         borderRadius={2}
                         p={3}
                         display="flex"
                         flexDirection="column"
                         alignItems="center"
-                        border={selectedFlight === 'outbound' ? 4 : 2} // 選択されたら枠が太くなる
-                        borderColor={selectedFlight === 'outbound' ? "#1565C0" : "#1E6374"} // 選択時は青、未選択時は既存色
+                        border={2} // 選択されたら枠が太くなる
+                        borderColor={ "#1E6374" } // 選択時は青、未選択時は既存色
                         bgcolor={backgroundColor}
                         sx={{ cursor: 'pointer', height: '100%' }}
-                        onClick={() => handleFlightClick('outbound')}
                     >
                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>往路</Typography>
                         <TableContainer component={Paper}>
@@ -116,18 +112,17 @@ export function FlightElement({ plan, flight, registerPlanToDB, onFlightRegister
                 </Grid>
 
                 {/* 帰路 */}
-                <Grid item xs={12} sm={5} sx={{ position: 'relative' }}>
+                <Grid item xs={12} sm={6} sx={{ position: 'relative' }}>
                     <Box
                         borderRadius={2}
                         p={3}
                         display="flex"
                         flexDirection="column"
                         alignItems="center"
-                        border={selectedFlight === 'inbound' ? 4 : 2} // 選択されたら枠が太くなる
-                        borderColor={selectedFlight === 'inbound' ? "#1565C0" : "#1E6374"} // 選択時は青、未選択時は既存色
+                        border={2} // 選択されたら枠が太くなる
+                        borderColor={"#1E6374"} // 選択時は青、未選択時は既存色
                         bgcolor={backgroundColor}
                         sx={{ cursor: 'pointer', height: '100%' }}
-                        onClick={() => handleFlightClick('inbound')}
                     >
                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>帰路</Typography>
                         <TableContainer component={Paper}>
@@ -168,11 +163,11 @@ export function FlightElement({ plan, flight, registerPlanToDB, onFlightRegister
             </Grid>
 
             {/* ボタンエリア */}
-            <Box mt={4} textAlign="center">
-                <Button variant="contained" color="primary" sx={{ px: 4, py: 1.5 }} onClick={registerFlight}>
+            <Box mt={4} textAlign="left">
+                <Button variant="contained" color="primary" disabled={disable} sx={{ px: 4, py: 1.5 }} onClick={registerFlight}>
                     OK
                 </Button>
-                <Button variant="contained" color="secondary" sx={{ mx: 1 }}>
+                <Button variant="contained" color="secondary" disabled={disable} sx={{ mx: 1 }}>
                     価格を下げたい
                 </Button>
             </Box>
