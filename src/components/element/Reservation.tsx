@@ -25,7 +25,7 @@ export function Reservation({plan, onReservationRequested}:Props): React.JSX.Ele
             console.log('The session ID is invalid.')
             return;
         } else {
-            const address = "ryota.tasks@gmail.com"
+            const address = plan.user && plan.user[0] ? plan.user[0].email || "" : "";
             const request: AgentRequest = {
                 sessionId: sessionId,
                 inputText: address,
