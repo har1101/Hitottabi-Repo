@@ -53,10 +53,10 @@ export function FlightElement({ plan, flight, registerPlanToDB, onFlightRegister
             {/* 出発日と帰着日を横並びで表示 */}
             <Grid container spacing={2}>
                 <Grid item xs={6}>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>出発日: {plan.travelBasic?.outbound.date}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>出発日: 2024年11月16日</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>帰着日: {plan.travelBasic?.inbound.date}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>帰着日: 2024年11月17日</Typography>
                 </Grid>
             </Grid>
 
