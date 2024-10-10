@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Button, FormControl, Typography, Stack } from "@mui/material";
 import { Plan } from "../section/MainContent.tsx";
 
@@ -18,25 +18,25 @@ interface Props {
     onPriceLowerRequest?: () => void; // オプショナルにする
 }
 
-const useWindowWidth = () => {
-    const [width, setWidth] = useState(window.innerWidth);
-
-    useEffect(() => {
-        const handleResize = () => setWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
-    return width;
-};
+// const useWindowWidth = () => {
+//     const [width, setWidth] = useState(window.innerWidth);
+//
+//     useEffect(() => {
+//         const handleResize = () => setWidth(window.innerWidth);
+//         window.addEventListener('resize', handleResize);
+//
+//         return () => {
+//             window.removeEventListener('resize', handleResize);
+//         };
+//     }, []);
+//
+//     return width;
+// };
 
 export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered, onPriceLowerRequest }: Props): React.JSX.Element {
     const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
     const [disable, setDisable] = useState(false)
-    const width = useWindowWidth();
+    // const width = useWindowWidth();
 
     // 背景色を一色で統一（薄めの青色）
     const backgroundColor = "#e0f7fa";
@@ -70,7 +70,7 @@ export function HotelElement({ plan, hotels, registerPlanToDB, onHotelRegistered
     };
 
     return (
-        <FormControl component="fieldset" sx={{ width: width * 0.5 }}>
+        <FormControl component="fieldset">
             <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
                 要望にあったホテルを3つ選んだよ✈
             </Typography>
